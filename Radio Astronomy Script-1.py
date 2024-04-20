@@ -47,7 +47,6 @@ default_observing_values = {
     'az_alt': ''
 }
 
-
 #Virgo and radio astronomy 
 # location varibles
 location_lat = 51.9
@@ -63,8 +62,8 @@ default_location_parameters = {
 
 
 
-#starting virgo
-class Observation():
+#starting virgo observation class
+""" class Observation():
 
 
     def __init__(self, name, observation_parameters, location_parameters, output_name = None, start_time = None, date = None) -> None:
@@ -78,9 +77,10 @@ class Observation():
             self.date = date
 
         if output_name is None:
-            self.data_name = f"observation data from {time.asctime(time.localtime())}.dat"
+            self.data_name = f"observation data using {self.name} from {time.asctime(time.localtime())}.dat"
         else:
             self.data_name = f"{output_name}.dat"
+
         if start_time is None:
             self.start_time = 20
         else:
@@ -91,9 +91,9 @@ class Observation():
         virgo.observe()
 
     @classmethod
-    def import_observation_parameters(cls):
+    def create_observation(cls):
         ...
-
+ """
 #starting pygame
 pygame.init()
 pygame.mixer.init()
@@ -135,8 +135,9 @@ class Button(pygame.sprite.Sprite):
 
         
 
-test = Observation("testinggg", default_observing_values)
+test = Observation("testinggg", default_observing_values, default_location_parameters)
 
-print(test.data_name)
+print(test.date)
 
-
+virgo.predict(default_location_parameters['lat'], default_location_parameters['lon'], default_location_parameters['height'], source= 'Cas A', date= '2024-4-20')
+virgo.map_hi(6,45)

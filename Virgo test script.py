@@ -44,6 +44,11 @@ observing_values = {
     'az_alt': ''
 }
 
+
+observing_values['ra_dec'] = 10
+
+print(observing_values['ra_dec'])
+
 def Get_Time():
 
     pass
