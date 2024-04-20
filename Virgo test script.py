@@ -1,10 +1,10 @@
 print("hi")
 import virgo
+import time 
 
 
 
-
-
+# Defining all the observing varibles
 observing_time = 60 # in seconds
 sdr_rf_gain = 20
 if_gain = 25
@@ -17,6 +17,9 @@ location = None
 ra_dec = None
 az_alt = None
 data_file_name = "Test data.dat"
+spectrometer_type = "FTF"
+observing_start_time = 30
+
 
 
 #location vars
@@ -42,18 +45,29 @@ observing_values = {
 }
 
 def Get_Time():
+
     pass
 
+
+timeee = time.localtime()
+print(time.asctime(timeee))
+print(time.localtime())
 
 
 print(virgo.wavelength(hydrogen_line_freq))
 
 print(virgo.galactic(12, 12))
 
+try:
+    virgo.observe(obs_parameters= observing_values, obs_file= data_file_name)
 
-virgo.observe(obs_parameters= observing_values, obs_file= data_file_name)
 
+    print(virgo.predict(location_lat, location_lon, location_elevation, plot_file= True))
+except ModuleNotFoundError as error:
+    print("try on the other computer")
+    print(error)
 
-print(virgo.predict(location_lat, location_lon, location_elevation, plot_file= True))
+finally:
+    print("done")
 
 
