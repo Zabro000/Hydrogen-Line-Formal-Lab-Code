@@ -21,7 +21,7 @@ sdr.gain_control_mode_chan0 = "slow_attack"
 
 sdr.tx_cyclic_buffer = True
 
-sdr.tx_hardwaregain_chan0 = - 50
+sdr.tx_hardwaregain_chan0 = -50
 
 sdr.rx_enabled_channels = [0]
 sdr.tx_enabled_channels = [0]
