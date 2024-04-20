@@ -60,40 +60,6 @@ default_location_parameters = {
     'height': location_elevation
 }
 
-
-
-#starting virgo observation class
-""" class Observation():
-
-
-    def __init__(self, name, observation_parameters, location_parameters, output_name = None, start_time = None, date = None) -> None:
-        self.name = name
-        self.obs_parameters = observation_parameters
-        self.location_parameters = location_parameters
-
-        if date is None:
-            self.date = time.asctime(time.localtime())
-        else:
-            self.date = date
-
-        if output_name is None:
-            self.data_name = f"observation data using {self.name} from {time.asctime(time.localtime())}.dat"
-        else:
-            self.data_name = f"{output_name}.dat"
-
-        if start_time is None:
-            self.start_time = 20
-        else:
-            self.start_time = start_time
-
-
-    def run_observation(self):
-        virgo.observe()
-
-    @classmethod
-    def create_observation(cls):
-        ...
- """
 #starting pygame
 pygame.init()
 pygame.mixer.init()
@@ -127,11 +93,32 @@ class Button(pygame.sprite.Sprite):
             self.state = False
         else:
             self.state = bool(state)
-        
+
 
     def update(self):
+        mouse_location = pygame.mouse.get_pos()
+
+
         ... 
 
+
+running = True 
+screen.fill(white)
+pygame.display.flip()
+while running:
+    clock.tick(fps)
+
+
+    for event in pygame.event.get():
+
+        if event.type == pygame.QUIT:
+            running = False
+
+    pygame.display.flip()
+
+    
+
+        
 
         
 
