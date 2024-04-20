@@ -1,4 +1,4 @@
-from pygame.sprite import _Group
+
 import virgo
 import time
 import pygame
@@ -58,7 +58,35 @@ date = None
 
 
 #starting virgo
+class Observation():
 
+
+    def __init__(self, name, observation_parameters, output_name = None, start_time = None) -> None:
+        self.name = name
+        self.obs_parameters = observation_parameters
+
+
+
+        if output_name is None:
+            self.data_name = f"observation data from {time.asctime(time.localtime())}.dat"
+        else:
+            self.data_name = f"{output_name}.dat"
+        if start_time is None:
+            self.start_time = 20
+        else:
+            self.start_time = start_time
+
+
+    def run_observation(self):
+        virgo.observe()
+
+    @classmethod
+    def import_observation_parameters(cls):
+        ...
+
+
+    
+        
 
 
 
@@ -98,10 +126,13 @@ class Button(pygame.sprite.Sprite):
         
 
     def update(self):
-        ... #placeholder
+        ... 
 
 
         
 
+test = Observation("testinggg", default_observing_values)
+
+print(test.data_name)
 
 
