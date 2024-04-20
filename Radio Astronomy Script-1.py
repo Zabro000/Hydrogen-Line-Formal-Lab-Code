@@ -55,17 +55,27 @@ location_lon = -114
 location_elevation = 1420 #m
 date = None
 
+default_location_parameters = {
+    'lat': location_lat,
+    'lon': location_lon,
+    'height': location_elevation
+}
+
 
 
 #starting virgo
 class Observation():
 
 
-    def __init__(self, name, observation_parameters, output_name = None, start_time = None) -> None:
+    def __init__(self, name, observation_parameters, location_parameters, output_name = None, start_time = None, date = None) -> None:
         self.name = name
         self.obs_parameters = observation_parameters
+        self.location_parameters = location_parameters
 
-
+        if date is None:
+            self.date = time.asctime(time.localtime())
+        else:
+            self.date = date
 
         if output_name is None:
             self.data_name = f"observation data from {time.asctime(time.localtime())}.dat"
@@ -83,12 +93,6 @@ class Observation():
     @classmethod
     def import_observation_parameters(cls):
         ...
-
-
-    
-        
-
-
 
 #starting pygame
 pygame.init()
