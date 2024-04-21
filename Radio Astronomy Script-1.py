@@ -3,6 +3,7 @@ import virgo
 import time
 import pygame
 import astropy
+import operator
 
 
 ### pygame varibles
@@ -18,6 +19,8 @@ off_red = (240,11,0)
 mid_red = (163,8,0)
 other_red = (231,12,30)
 dark_red = (65,3,0)
+
+main_screen_color = white
 
 ### Virgo and radio astronomy varibles
 observing_time = 60 # in seconds
@@ -98,8 +101,29 @@ class Button(pygame.sprite.Sprite):
     def update(self):
         mouse_location = pygame.mouse.get_pos()
 
+    def button_click(self, mouse_position):
+         if self.rect.left <= mouse_position[0] <= self.rect.left + self.button_width and self.rect.top <= mouse_position[1] <= self.rect.bottom:
+                print("button was pressed")
+                self.color = dark_red
+                self.state = operator.not_(self.state)
+                self.image.fill(self.color)
+                print(self.state)
+                
 
-        ... 
+
+def draw_txt(surf, text, size, color, x, y):
+    font = pygame.font.Font(font_name, size)
+    text_surface = font.render(text, True, color)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x, y)
+    surf.blit(text_surface, text_rect)
+
+color_button = Button("Night Mode", screen_width/2, screen_height/2)
+
+
+all_buttons = pygame.sprite.Group()
+all_buttons.add(color_button)
+ 
 
 
 running = True 
@@ -113,7 +137,17 @@ while running:
 
         if event.type == pygame.QUIT:
             running = False
+        
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            Button.button_click(color_button, pygame.mouse.get_pos())
 
+
+
+
+    screen.fill(white)
+    all_buttons.update()
+    all_buttons.draw(screen)
+    draw_txt(screen, color_button.button_text, 19, white, color_button.rect.centerx, color_button.rect.centery)
     pygame.display.flip()
 
     
