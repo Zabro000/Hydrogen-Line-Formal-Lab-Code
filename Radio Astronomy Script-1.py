@@ -19,8 +19,12 @@ off_red = (240,11,0)
 mid_red = (163,8,0)
 other_red = (231,12,30)
 dark_red = (65,3,0)
+green = (23,255,69)
+light_green = (135,225,143)
 
 main_screen_color = white
+normal_button_colors = {'off': black, 'on': green, 'hover': light_green}
+night_mode_button_colors = {'off': black, 'on': red, 'hover': mid_red}
 
 ### Virgo and radio astronomy varibles
 observing_time = 60 # in seconds
@@ -75,7 +79,7 @@ font_name = pygame.font.match_font('calibri')
 class Button(pygame.sprite.Sprite):
     
 
-    def __init__(self, button_text, position_x, position_y, color = None, state = None) -> None:
+    def __init__(self, button_text, position_x, position_y, colors = None, state = None) -> None:
         self.button_width = 200
         self.button_height = 100
         pygame.sprite.Sprite.__init__(self)
@@ -86,28 +90,62 @@ class Button(pygame.sprite.Sprite):
         self.y_position = position_y 
         self.button_text = button_text
 
-        if color is None:
-            self.color = red
+
+        if colors is None:
+            self.colors = night_mode_button_colors
+        #Checks that the color inputted is only a dict
+        elif isinstance(colors, dict):
+            self.colors = colors
         else:
-            self.color = color 
-        self.image.fill(self.color)
+            raise TypeError
 
         if state is None:
             self.state = False
         else:
             self.state = bool(state)
+        
+
+        if self.state == False:
+            self.text_state = "off"
+            self.current_color = self.colors['off']
+        else:
+            self.text_state = "on"
+            self.current_color = self.colors['on']
+
+        self.image.fill(self.current_color)
 
 
     def update(self):
-        mouse_location = pygame.mouse.get_pos()
+        ...
+   
 
+    
     def button_click(self, mouse_position):
          if self.rect.left <= mouse_position[0] <= self.rect.left + self.button_width and self.rect.top <= mouse_position[1] <= self.rect.bottom:
-                print("button was pressed")
-                self.color = dark_red
+                
+                # flips the button state to the opposite bool
                 self.state = operator.not_(self.state)
-                self.image.fill(self.color)
-                print(self.state)
+
+
+                #changes color and text depeding on if the button is on or off 
+                if self.state == True:
+                    self.current_color = self.colors['on']
+                    self.image.fill(self.current_color)
+                    self.text_state = "on"
+                else:
+                    self.current_color = self.colors['off']
+                    self.image.fill(self.current_color)
+                    self.text_state = "off"
+
+    
+    def cursor_hover(self, mouse_position):
+        if self.rect.left <= mouse_position[0] <= self.rect.left + self.button_width and self.rect.top <= mouse_position[1] <= self.rect.bottom:
+            self.image.fill(self.colors['hover'])
+        else:
+            self.image.fill(self.current_color)
+
+
+                
                 
 
 
@@ -118,11 +156,13 @@ def draw_txt(surf, text, size, color, x, y):
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
 
-color_button = Button("Night Mode", screen_width/2, screen_height/2)
+color_button = Button("Night Mode", screen_width/2, screen_height/2, normal_button_colors)
+skip_button = Button("Skip Settings", screen_width/2 - 300, screen_height/2, normal_button_colors)
 
 
 all_buttons = pygame.sprite.Group()
 all_buttons.add(color_button)
+all_buttons.add(skip_button)
  
 
 
@@ -140,14 +180,23 @@ while running:
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             Button.button_click(color_button, pygame.mouse.get_pos())
+            Button.button_click(skip_button, pygame.mouse.get_pos())
+        
+        
 
 
 
-
+    Button.cursor_hover(color_button, pygame.mouse.get_pos())
+    Button.cursor_hover(skip_button, pygame.mouse.get_pos())
     screen.fill(white)
     all_buttons.update()
     all_buttons.draw(screen)
     draw_txt(screen, color_button.button_text, 19, white, color_button.rect.centerx, color_button.rect.centery)
+    draw_txt(screen, color_button.text_state, 19, white, color_button.rect.centerx, color_button.rect.centery - 20)
+    draw_txt(screen, skip_button.button_text, 19, white, skip_button.rect.centerx, skip_button.rect.centery)
+    draw_txt(screen, skip_button.text_state, 19, white, skip_button.rect.centerx, skip_button.rect.centery - 20)
+    
+    
     pygame.display.flip()
 
     
