@@ -24,7 +24,7 @@ light_green = (135,225,143)
 
 main_screen_color = white
 normal_button_colors = {'off': black, 'on': green, 'hover': light_green}
-night_mode_button_colors = {'off': black, 'on': red, 'hover': mid_red}
+night_mode_button_colors = {'off': black, 'on': red, 'hover': other_red}
 
 ### Virgo and radio astronomy varibles
 observing_time = 60 # in seconds
@@ -156,8 +156,8 @@ def draw_txt(surf, text, size, color, x, y):
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
 
-color_button = Button("Night Mode", screen_width/2, screen_height/2, normal_button_colors)
-skip_button = Button("Skip Settings", screen_width/2 - 300, screen_height/2, normal_button_colors)
+color_button = Button("Night Mode", screen_width/2, screen_height/2)
+skip_button = Button("Skip Settings", screen_width/2 - 300, screen_height/2)
 
 
 all_buttons = pygame.sprite.Group()
