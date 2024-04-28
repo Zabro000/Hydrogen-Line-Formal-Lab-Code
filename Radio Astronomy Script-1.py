@@ -191,6 +191,7 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             Button.button_click(color_button, pygame.mouse.get_pos())
             Button.button_click(skip_button, pygame.mouse.get_pos())
+            Button.button_click(continue_button, pygame.mouse.get_pos())
 
             if continue_button.state == True :
                 running = False
@@ -256,7 +257,7 @@ while running:
             #raises basic error so the program will stop 
             raise WindowsError
         
-        
+
 
 
 
