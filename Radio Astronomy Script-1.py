@@ -71,7 +71,7 @@ default_location_parameters = {
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Penny Lab Simulation")
+pygame.display.set_caption("Hydrogen Line")
 clock = pygame.time.Clock()
 font_name = pygame.font.match_font('calibri')
 
@@ -131,11 +131,14 @@ class Button(pygame.sprite.Sprite):
                 if self.state == True:
                     self.current_color = self.colors['on']
                     self.image.fill(self.current_color)
-                    self.text_state = "on"
+                    self.text_state = "selected"
                 else:
                     self.current_color = self.colors['off']
                     self.image.fill(self.current_color)
                     self.text_state = "off"
+
+                # Return true so the button if statements in the while loop can run 
+                return True
 
     
     def cursor_hover(self, mouse_position):
@@ -158,11 +161,15 @@ def draw_txt(surf, text, size, color, x, y):
 
 color_button = Button("Night Mode", screen_width/2, screen_height/2)
 skip_button = Button("Skip Settings", screen_width/2 - 300, screen_height/2)
+continue_button = Button("Continue", screen_width/2, screen_height/2 + 200)
+location_settings_button = Button("Set ", screen_width/2 -300, screen_height/2 + 200)
 
 
-all_buttons = pygame.sprite.Group()
-all_buttons.add(color_button)
-all_buttons.add(skip_button)
+screen_1_buttons = pygame.sprite.Group()
+screen_1_buttons.add(color_button)
+screen_1_buttons.add(skip_button)
+screen_1_buttons.add(continue_button)
+screen_1_buttons.add(location_settings_button)
  
 
 
@@ -177,10 +184,22 @@ while running:
 
         if event.type == pygame.QUIT:
             running = False
+            print("Program will hult now!")
+            #raises basic error so the program will stop 
+            raise WindowsError
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             Button.button_click(color_button, pygame.mouse.get_pos())
             Button.button_click(skip_button, pygame.mouse.get_pos())
+
+            if continue_button.state == True :
+                running = False
+
+            if color_button.state == True:
+                color_button.colors = normal_button_colors
+            else:
+                color_button.colors = night_mode_button_colors
+                
         
         
 
@@ -188,16 +207,62 @@ while running:
 
     Button.cursor_hover(color_button, pygame.mouse.get_pos())
     Button.cursor_hover(skip_button, pygame.mouse.get_pos())
+    Button.cursor_hover(continue_button, pygame.mouse.get_pos())
+
     screen.fill(white)
-    all_buttons.update()
-    all_buttons.draw(screen)
+    screen_1_buttons.update()
+    screen_1_buttons.draw(screen)
     draw_txt(screen, color_button.button_text, 19, white, color_button.rect.centerx, color_button.rect.centery)
     draw_txt(screen, color_button.text_state, 19, white, color_button.rect.centerx, color_button.rect.centery - 20)
     draw_txt(screen, skip_button.button_text, 19, white, skip_button.rect.centerx, skip_button.rect.centery)
     draw_txt(screen, skip_button.text_state, 19, white, skip_button.rect.centerx, skip_button.rect.centery - 20)
+    draw_txt(screen, continue_button.button_text, 19, white, continue_button.rect.centerx, continue_button.rect.centery)
+    draw_txt(screen, continue_button.text_state, 19, white, continue_button.rect.centerx, continue_button.rect.centery - 20)
     
     
     pygame.display.flip()
+
+
+
+
+
+### Second loop for getting the observation ready
+
+running = True 
+
+manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 500, screen_height/2 - 400)
+auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 500, screen_height/2 - 200)
+hi_display_button = Button("Show Hydrogen", screen_width/2 - 200, screen_height/2)
+
+
+screen_2_buttons = pygame.sprite.Group()
+
+screen_2_buttons.add(manual_alt_az_button)
+screen_2_buttons.add(auto_alt_az_button)
+screen_2_buttons.add(hi_display_button)
+
+screen.fill(white)
+pygame.display.flip()
+
+while running: 
+
+    clock.tick(fps)
+
+    for event in pygame.event.get():
+
+        if event.type == pygame.QUIT:
+            running = False
+            print("Program will hult now!")
+            #raises basic error so the program will stop 
+            raise WindowsError
+        
+        
+
+
+
+
+
+
 
     
 
