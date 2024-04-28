@@ -147,6 +147,10 @@ class Button(pygame.sprite.Sprite):
         else:
             self.image.fill(self.current_color)
 
+    def draw_basic_button_text(self):
+        draw_txt(screen, self.button_text, 19, white, self.rect.centerx, self.rect.centery)
+        draw_txt(screen, self.text_state, 19, white, self.rect.centerx, self.rect.centery - 20)
+
 
                 
                 
@@ -162,7 +166,7 @@ def draw_txt(surf, text, size, color, x, y):
 color_button = Button("Night Mode", screen_width/2, screen_height/2)
 skip_button = Button("Skip Settings", screen_width/2 - 300, screen_height/2)
 continue_button = Button("Continue", screen_width/2, screen_height/2 + 200)
-location_settings_button = Button("Set ", screen_width/2 -300, screen_height/2 + 200)
+location_settings_button = Button("Set Location", screen_width/2 -300, screen_height/2 + 200)
 
 
 screen_1_buttons = pygame.sprite.Group()
@@ -209,16 +213,27 @@ while running:
     Button.cursor_hover(color_button, pygame.mouse.get_pos())
     Button.cursor_hover(skip_button, pygame.mouse.get_pos())
     Button.cursor_hover(continue_button, pygame.mouse.get_pos())
+    Button.cursor_hover(location_settings_button, pygame.mouse.get_pos())
 
     screen.fill(white)
     screen_1_buttons.update()
     screen_1_buttons.draw(screen)
-    draw_txt(screen, color_button.button_text, 19, white, color_button.rect.centerx, color_button.rect.centery)
+
+    Button.draw_basic_button_text(color_button)
+    Button.draw_basic_button_text(continue_button)
+    Button.draw_basic_button_text(skip_button)
+    Button.draw_basic_button_text(location_settings_button)
+
+
+
+
+    
+    """ draw_txt(screen, color_button.button_text, 19, white, color_button.rect.centerx, color_button.rect.centery)
     draw_txt(screen, color_button.text_state, 19, white, color_button.rect.centerx, color_button.rect.centery - 20)
     draw_txt(screen, skip_button.button_text, 19, white, skip_button.rect.centerx, skip_button.rect.centery)
     draw_txt(screen, skip_button.text_state, 19, white, skip_button.rect.centerx, skip_button.rect.centery - 20)
     draw_txt(screen, continue_button.button_text, 19, white, continue_button.rect.centerx, continue_button.rect.centery)
-    draw_txt(screen, continue_button.text_state, 19, white, continue_button.rect.centerx, continue_button.rect.centery - 20)
+    draw_txt(screen, continue_button.text_state, 19, white, continue_button.rect.centerx, continue_button.rect.centery - 20) """
     
     
     pygame.display.flip()
