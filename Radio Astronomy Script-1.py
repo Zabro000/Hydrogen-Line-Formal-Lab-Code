@@ -109,7 +109,7 @@ class Button(pygame.sprite.Sprite):
             self.text_state = "off"
             self.current_color = self.colors['off']
         else:
-            self.text_state = "on"
+            self.text_state = "selected"
             self.current_color = self.colors['on']
 
         self.image.fill(self.current_color)
@@ -196,6 +196,7 @@ while running:
             Button.button_click(color_button, pygame.mouse.get_pos())
             Button.button_click(skip_button, pygame.mouse.get_pos())
             Button.button_click(continue_button, pygame.mouse.get_pos())
+            Button.button_click(location_settings_button, pygame.mouse.get_pos())
 
             if continue_button.state == True :
                 running = False
@@ -271,6 +272,15 @@ while running:
             print("Program will hult now!")
             #raises basic error so the program will stop 
             raise WindowsError
+        
+
+
+
+    screen.fill(white)
+    screen_2_buttons.update()
+    screen_2_buttons.draw(screen)
+    pygame.display.flip()
+
         
 
 
