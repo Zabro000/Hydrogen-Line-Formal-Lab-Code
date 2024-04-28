@@ -54,6 +54,11 @@ default_observing_values = {
     'az_alt': ''
 }
 
+observation_ra = None 
+observation_dec = None 
+observation_alt = None 
+observation_az = None
+
 #Virgo and radio astronomy 
 # location varibles
 location_lat = 51.9
@@ -247,8 +252,8 @@ while running:
 
 running = True 
 
-manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 500, screen_height/2 - 400)
-auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 500, screen_height/2 - 200)
+manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 300, screen_height/2 - 300)
+auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 300, screen_height/2 - 100)
 hi_display_button = Button("Show Hydrogen", screen_width/2 - 200, screen_height/2)
 
 
@@ -266,12 +271,23 @@ while running:
     clock.tick(fps)
 
     for event in pygame.event.get():
+        Button.button_click(manual_alt_az_button, pygame.mouse.get_pos())
+        Button.button_click(auto_alt_az_button, pygame.mouse.get_pos())
+        Button.button_click(hi_display_button, pygame.mouse.get_pos())
+
+        
 
         if event.type == pygame.QUIT:
             running = False
             print("Program will hult now!")
             #raises basic error so the program will stop 
             raise WindowsError
+        
+        if hi_display_button.state == True: 
+
+            equatorial_coordinates = virgo.equatorial(30, 210, location_lat, location_lon, location_elevation)
+
+            virgo.map_hi(equatorial_coordinates[0], equatorial_coordinates[1])
         
 
 
