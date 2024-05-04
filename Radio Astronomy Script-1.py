@@ -121,6 +121,9 @@ class Button(pygame.sprite.Sprite):
 
 
     def update(self):
+
+
+        #Updates the button states so if I change the state of the button manually its color wont be weird 
         if self.state == True:
             self.current_color = self.colors['on']
             self.image.fill(self.current_color)
@@ -133,7 +136,7 @@ class Button(pygame.sprite.Sprite):
    
 
     
-    def button_click(self, mouse_position):
+    def on_or_off_button_click(self, mouse_position):
          if self.rect.left <= mouse_position[0] <= self.rect.left + self.button_width and self.rect.top <= mouse_position[1] <= self.rect.bottom:
                 
                 # flips the button state to the opposite bool
@@ -152,6 +155,17 @@ class Button(pygame.sprite.Sprite):
 
                 # Return true so the button if statements in the while loop can run 
                 return True
+         
+         return False
+
+
+    def doer_button_click(self, mouse_position):
+         if self.rect.left <= mouse_position[0] <= self.rect.left + self.button_width and self.rect.top <= mouse_position[1] <= self.rect.bottom:
+             
+             self.state = operator.not_(self.state)
+
+             return True 
+             
 
     
     def cursor_hover(self, mouse_position):
@@ -228,10 +242,10 @@ while running:
             raise WindowsError
         
         if event.type == pygame.MOUSEBUTTONDOWN:
-            Button.button_click(color_button, pygame.mouse.get_pos())
-            Button.button_click(skip_button, pygame.mouse.get_pos())
-            Button.button_click(continue_button, pygame.mouse.get_pos())
-            Button.button_click(location_settings_button, pygame.mouse.get_pos())
+            Button.on_or_off_button_click(color_button, pygame.mouse.get_pos())
+            Button.on_or_off_button_click(skip_button, pygame.mouse.get_pos())
+            Button.on_or_off_button_click(continue_button, pygame.mouse.get_pos())
+            Button.on_or_off_button_click(location_settings_button, pygame.mouse.get_pos())
 
             if continue_button.state == True :
                 running = False
@@ -275,11 +289,12 @@ while running:
     for event in pygame.event.get():
         
         if event.type == pygame.MOUSEBUTTONDOWN:
-            Button.button_click(manual_alt_az_button, pygame.mouse.get_pos())
-            Button.button_click(auto_alt_az_button, pygame.mouse.get_pos())
-            Button.button_click(hi_display_button, pygame.mouse.get_pos())
+            Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
+            Button.on_or_off_button_click(auto_alt_az_button, pygame.mouse.get_pos())
+            temp_state = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
 
 
+            #Updating the button's state mid loop required that stuff in the update method
             if hi_display_button.state == True: 
 
                 equatorial_coordinates = virgo.equatorial(30, 210, location_lat, location_lon, location_elevation)
@@ -287,7 +302,7 @@ while running:
                 virgo.map_hi(equatorial_coordinates[0], equatorial_coordinates[1])
 
                 hi_display_button.state = False 
-                hi_display_button.button_click(pygame.mouse.get_pos())
+                hi_display_button.on_or_off_button_click(pygame.mouse.get_pos())
 
         
 
