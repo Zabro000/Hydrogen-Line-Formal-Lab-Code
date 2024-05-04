@@ -97,7 +97,7 @@ class Button(pygame.sprite.Sprite):
 
 
         if colors is None:
-            self.colors = night_mode_button_colors
+            self.colors = normal_button_colors
         #Checks that the color inputted is only a dict
         elif isinstance(colors, dict):
             self.colors = colors
@@ -157,7 +157,19 @@ class Button(pygame.sprite.Sprite):
         draw_txt(screen, self.text_state, 19, white, self.rect.centerx, self.rect.centery - 20)
 
 
-                
+
+def parse_time() -> str:
+    time_tuple = time.localtime()
+    
+    year = time_tuple.tm_year
+    month = time_tuple.tm_mon
+    day = time_tuple.tm_mday
+
+    virgo_time_string = f"{year}-{month}-{day}"
+
+    return virgo_time_string
+
+
                 
 
 
@@ -168,7 +180,7 @@ def draw_txt(surf, text, size, color, x, y):
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
 
-color_button = Button("Night Mode", screen_width/2, screen_height/2)
+color_button = Button("Night Mode", screen_width/2, screen_height/2,  )
 skip_button = Button("Skip Settings", screen_width/2 - 300, screen_height/2)
 continue_button = Button("Continue", screen_width/2, screen_height/2 + 200)
 location_settings_button = Button("Set Location", screen_width/2 -300, screen_height/2 + 200)
