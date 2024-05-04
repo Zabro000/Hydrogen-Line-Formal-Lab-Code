@@ -11,7 +11,7 @@ import virgo
 
 def parse_time() -> str:
     time_tuple = time.localtime()
-    
+
     year = time_tuple.tm_year
     month = time_tuple.tm_mon
     day = time_tuple.tm_mday
@@ -21,10 +21,22 @@ def parse_time() -> str:
     return virgo_time_string
 
 
+def test_parse_time():
+    time_tuple = time.localtime() 
+    year = time_tuple.tm_year
+    year_day = time_tuple.tm_yday
+    month = time_tuple.tm_mon
+    normal_day = time_tuple.tm_mday
+    hour = time_tuple.tm_hour
+    minute = time_tuple.tm_min
 
+    stringg = f"Hydrogen Line Data taken in {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}"
 
+    print(stringg)
 
+print(time.asctime(time.localtime()))
 parse_time()
+test_parse_time()
 
 # '2024-4-20'
 
