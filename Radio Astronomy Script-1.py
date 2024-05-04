@@ -8,7 +8,88 @@ from Phidget22.Phidget import *
 from Phidget22.Devices.Spatial import *
 
 
-### pygame varibles
+### Virgo and radio astronomy varibles
+observing_time = 60 # in seconds
+sdr_rf_gain = 20
+if_gain = 25
+bb_gain = 18
+hydrogen_line_freq = 1.420405751768 * 10**9
+observing_bandwidth = 2.4 * 10**6
+channels = 2048
+t_sample = 1
+location = None
+ra_dec = None
+az_alt = None
+data_file_name = "Test data.dat"
+
+default_observing_values = {
+    'dev_args': '',
+    'rf_gain': sdr_rf_gain,
+    'if_gain': if_gain,
+    'bb_gain': bb_gain,
+    'frequency': hydrogen_line_freq,
+    'bandwidth': observing_bandwidth,
+    'channels': channels,
+    't_sample': t_sample,
+    'duration': observing_time,
+    'loc': '',
+    'ra_dec': '',
+    'az_alt': ''
+}
+
+final_observing_values = {
+    'dev_args': '',
+    'rf_gain': sdr_rf_gain,
+    'if_gain': if_gain,
+    'bb_gain': bb_gain,
+    'frequency': hydrogen_line_freq,
+    'bandwidth': observing_bandwidth,
+    'channels': channels,
+    't_sample': t_sample,
+    'duration': observing_time,
+    'loc': '',
+    'ra_dec': '',
+    'az_alt': ''
+}
+
+### Varibles for the Coordinates
+observation_ra = None 
+observation_dec = None 
+observation_ra_dec = [observation_ra, observation_dec]
+observation_alt = None 
+observation_az = None
+observation_az_alt = [observation_az, observation_alt]
+
+default_observation_coordinates = {
+    'azimuth': observation_az,
+    'altitude': observation_alt,
+    'azimuth and altitude list': observation_az_alt,
+    'right ascension': observation_ra,
+    'declination': observation_dec,
+    'right ascension and declination list': observation_ra_dec
+}
+
+
+### location varibles
+location_lat = 51
+location_lon = -114
+location_elevation = 1420 #m
+date = None
+
+default_location_parameters = {
+    'lat': location_lat,
+    'lon': location_lon,
+    'height': location_elevation
+}
+
+
+
+### Phidget spatial sensor code
+attachment_time = 5 * 1000
+
+
+
+### Pygame varibles
 screen_width = 1600
 screen_height = 900
 fps = 30 
@@ -28,69 +109,7 @@ main_screen_color = white
 normal_button_colors = {'off': black, 'on': green, 'hover': light_green}
 night_mode_button_colors = {'off': black, 'on': red, 'hover': other_red}
 
-### Virgo and radio astronomy varibles
-observing_time = 60 # in seconds
-sdr_rf_gain = 20
-if_gain = 25
-bb_gain = 18
-hydrogen_line_freq = 1.420405751768 * 10**9
-observing_bandwidth = 2.4 * 10**6
-channels = 2048
-t_sample = 1
-location = None
-ra_dec = None
-az_alt = None
-data_file_name = "Test data.dat"
-default_observing_values = {
-    'dev_args': '',
-    'rf_gain': sdr_rf_gain,
-    'if_gain': if_gain,
-    'bb_gain': bb_gain,
-    'frequency': hydrogen_line_freq,
-    'bandwidth': observing_bandwidth,
-    'channels': channels,
-    't_sample': t_sample,
-    'duration': observing_time,
-    'loc': '',
-    'ra_dec': '',
-    'az_alt': ''
-}
-
-observation_ra = None 
-observation_dec = None 
-observation_ra_dec = [observation_ra, observation_dec]
-observation_alt = None 
-observation_az = None
-observation_alt_az = [observation_az, observation_alt]
-
-default_observation_coordinates = {
-    'azimuth': observation_az,
-    'altitude': observation_alt,
-    'azimuth and altitude list': observation_alt_az,
-    'right ascension': observation_ra,
-    'declination': observation_dec,
-    'right ascension and declination list': observation_ra_dec
-}
-
-
-#Virgo and radio astronomy 
-#location varibles
-location_lat = 51
-location_lon = -114
-location_elevation = 1420 #m
-date = None
-
-default_location_parameters = {
-    'lat': location_lat,
-    'lon': location_lon,
-    'height': location_elevation
-}
-
-#Phidget spatial sensor code
-attachment_time = 5 * 1000
-
-
-#starting pygame
+### Starting pygame
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
@@ -284,7 +303,7 @@ while running:
             Button.on_or_off_button_click(color_button, pygame.mouse.get_pos())
             Button.on_or_off_button_click(skip_button, pygame.mouse.get_pos())
             Button.on_or_off_button_click(continue_button, pygame.mouse.get_pos())
-            Button.on_or_off_button_click(location_settings_button, pygame.mouse.get_pos())
+            check_state_1 = Button.on_or_off_button_click(location_settings_button, pygame.mouse.get_pos())
 
             if continue_button.state == True :
                 running = False
@@ -293,6 +312,9 @@ while running:
                 color_button.colors = normal_button_colors
             else:
                 color_button.colors = night_mode_button_colors
+
+            if location_settings_button == True and check_state_1 == True:
+                print("click")
 
     end_of_game_loop_button_render(screen, screen_1_buttons)
     
@@ -334,7 +356,7 @@ while running:
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
-            Button.on_or_off_button_click(auto_alt_az_button, pygame.mouse.get_pos())
+            check_state_2 =Button.on_or_off_button_click(auto_alt_az_button, pygame.mouse.get_pos())
             temp_state = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
             temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
             temp_state_3 = Button.doer_button_click(run_observation_button, pygame.mouse.get_pos())
@@ -356,8 +378,24 @@ while running:
                 else:
                     print("The angle sensor is connected!")
 
-            if temp_state_3 == True:
+            if manual_alt_az_button.state == True and check_state_2 == True:
                 ...
+
+
+            if temp_state_3 == True:
+                final_observing_values['loc']
+                final_observing_values['duration'] = observing_time
+                final_observing_values['rf_gain'] = sdr_rf_gain
+                final_observing_values['ra_dec'] = observation_ra_dec
+                final_observing_values['az_alt'] = observation_az_alt
+                output_name = output_data_file_name()
+
+                try: 
+                    virgo.observe(final_observing_values, 'wola', output_name)
+                except:
+                    print("Check if the SDR is connected")
+                
+
 
 
 

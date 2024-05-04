@@ -45,5 +45,29 @@ print(time.asctime(time.localtime()))
 #virgo.map_hi(16, -26)
 
 
+sillyyy = "asdasd"
+fluffy = 90
+ra = 36
+dec = 74
 
+
+loc = [ra, dec]
+
+print(loc)
+
+ra = 1 
+
+loc[ra] = ra
+
+print(loc)
+
+cloud = {
+    'silly': sillyyy,
+    'fluffy': fluffy
+}
+
+fluffy = 0.0090
+
+cloud['fluffy'] = fluffy
+print(cloud['fluffy'])
 
