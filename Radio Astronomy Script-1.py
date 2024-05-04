@@ -58,12 +58,24 @@ default_observing_values = {
 
 observation_ra = None 
 observation_dec = None 
+observation_ra_dec = [observation_ra, observation_dec]
 observation_alt = None 
 observation_az = None
+observation_alt_az = [observation_az, observation_alt]
+
+default_observation_coordinates = {
+    'azimuth': observation_az,
+    'altitude': observation_alt,
+    'azimuth and altitude list': observation_alt_az,
+    'right ascension': observation_ra,
+    'declination': observation_dec,
+    'right ascension and declination list': observation_ra_dec
+}
+
 
 #Virgo and radio astronomy 
-# location varibles
-location_lat = 51.9
+#location varibles
+location_lat = 51
 location_lon = -114
 location_elevation = 1420 #m
 date = None
@@ -130,11 +142,6 @@ class Button(pygame.sprite.Sprite):
         ...
 
 
-        #Updates the button states so if I change the state of the button manually its color wont be weird 
-        
-   
-
-    
     def on_or_off_button_click(self, mouse_position):
          if self.rect.left <= mouse_position[0] <= self.rect.left + self.button_width and self.rect.top <= mouse_position[1] <= self.rect.bottom:
                 
@@ -167,7 +174,6 @@ class Button(pygame.sprite.Sprite):
          
          return False
              
-
     
     def cursor_hover(self, mouse_position):
         if self.rect.left <= mouse_position[0] <= self.rect.left + self.button_width and self.rect.top <= mouse_position[1] <= self.rect.bottom:
@@ -178,6 +184,38 @@ class Button(pygame.sprite.Sprite):
     def draw_basic_button_text(self):
         draw_txt(screen, self.button_text, 19, white, self.rect.centerx, self.rect.centery -20)
         draw_txt(screen, self.text_state, 19, white, self.rect.centerx, self.rect.centery)
+
+def output_data_file_name(sdr_gain = None, coordinates_dict = None, observation_time = None) -> str:
+
+    if sdr_gain == None: 
+        #Refers to thr rf gain for the sdr outside of this function 
+        global sdr_rf_gain
+        sdr_gain = sdr_rf_gain
+
+    if coordinates_dict == None:
+        global default_observation_coordinates
+        coordinates_dict = default_observation_coordinates
+
+    if observation_time == None:
+        global observing_time
+        observation_time = observing_time
+
+    time_tuple = time.localtime() 
+
+    year = time_tuple.tm_year
+    year_day = time_tuple.tm_yday
+    month = time_tuple.tm_mon
+    normal_day = time_tuple.tm_mday
+    hour = time_tuple.tm_hour
+    minute = time_tuple.tm_min
+
+    ra = coordinates_dict['right ascension']
+    dec = coordinates_dict['declination']
+
+    file_name = f"Hydrogen Line Observation Data taken in {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, SDR gain is {sdr_gain}, ra and dec coordinates are {ra}, {dec}.dat"
+
+    return file_name
+
 
 
 
@@ -272,6 +310,7 @@ manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 600, screen_heig
 auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 600, screen_height/2 + 100)
 hi_display_button = Button("Show Hydrogen Map", screen_width/2 - 300, screen_height/2 - 100)
 test_spatial_phidget_button = Button("Test Phidget", screen_width/2 - 600, screen_height/2 - 100)
+run_observation_button = Button("Begin Observation", screen_width/2 + 600, screen_height/2 -100)
 
 
 
@@ -281,6 +320,7 @@ screen_2_buttons.add(manual_alt_az_button)
 screen_2_buttons.add(auto_alt_az_button)
 screen_2_buttons.add(hi_display_button)
 screen_2_buttons.add(test_spatial_phidget_button)
+screen_2_buttons.add(run_observation_button)
 
 
 screen.fill(white)
@@ -297,6 +337,7 @@ while running:
             Button.on_or_off_button_click(auto_alt_az_button, pygame.mouse.get_pos())
             temp_state = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
             temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
+            temp_state_3 = Button.doer_button_click(run_observation_button, pygame.mouse.get_pos())
 
 
             #Updating the button's state mid loop required that stuff in the update method
@@ -314,6 +355,10 @@ while running:
                     print("The phidget is probably not attached, ", error)
                 else:
                     print("The angle sensor is connected!")
+
+            if temp_state_3 == True:
+                ...
+
 
 
 
