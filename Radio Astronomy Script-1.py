@@ -270,7 +270,7 @@ running = True
 
 manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 600, screen_height/2 - 300)
 auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 600, screen_height/2 + 100)
-hi_display_button = Button("Show Hydrogen", screen_width/2 - 300, screen_height/2 - 100)
+hi_display_button = Button("Show Hydrogen Map", screen_width/2 - 300, screen_height/2 - 100)
 test_spatial_phidget_button = Button("Test Phidget", screen_width/2 - 600, screen_height/2 - 100)
 
 
@@ -312,6 +312,9 @@ while running:
                     angle_sensor.openWaitForAttachment(attachment_time)
                 except PhidgetException as error:
                     print("The phidget is probably not attached, ", error)
+                else:
+                    print("The angle sensor is connected!")
+
 
 
 
