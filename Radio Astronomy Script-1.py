@@ -121,7 +121,15 @@ class Button(pygame.sprite.Sprite):
 
 
     def update(self):
-        ...
+        if self.state == True:
+            self.current_color = self.colors['on']
+            self.image.fill(self.current_color)
+            self.text_state = "selected"
+        else:
+            self.current_color = self.colors['off']
+            self.image.fill(self.current_color)
+            self.text_state = "off"
+        
    
 
     
@@ -170,7 +178,17 @@ def parse_time() -> str:
     return virgo_time_string
 
 
-                
+def end_of_game_loop_button_render(general_screen, button_group) -> None:
+    button_group.update()
+
+    for button in button_group:
+        Button.cursor_hover(button, pygame.mouse.get_pos())
+
+    general_screen.fill(white)
+    button_group.draw(screen)
+
+    for button in button_group: 
+        Button.draw_basic_button_text(button)
 
 
 def draw_txt(surf, text, size, color, x, y):
@@ -222,37 +240,8 @@ while running:
                 color_button.colors = normal_button_colors
             else:
                 color_button.colors = night_mode_button_colors
-                
-        
-        
 
-
-
-    Button.cursor_hover(color_button, pygame.mouse.get_pos())
-    Button.cursor_hover(skip_button, pygame.mouse.get_pos())
-    Button.cursor_hover(continue_button, pygame.mouse.get_pos())
-    Button.cursor_hover(location_settings_button, pygame.mouse.get_pos())
-
-    screen.fill(white)
-    screen_1_buttons.update()
-    screen_1_buttons.draw(screen)
-
-    Button.draw_basic_button_text(color_button)
-    Button.draw_basic_button_text(continue_button)
-    Button.draw_basic_button_text(skip_button)
-    Button.draw_basic_button_text(location_settings_button)
-
-
-
-
-    
-    """ draw_txt(screen, color_button.button_text, 19, white, color_button.rect.centerx, color_button.rect.centery)
-    draw_txt(screen, color_button.text_state, 19, white, color_button.rect.centerx, color_button.rect.centery - 20)
-    draw_txt(screen, skip_button.button_text, 19, white, skip_button.rect.centerx, skip_button.rect.centery)
-    draw_txt(screen, skip_button.text_state, 19, white, skip_button.rect.centerx, skip_button.rect.centery - 20)
-    draw_txt(screen, continue_button.button_text, 19, white, continue_button.rect.centerx, continue_button.rect.centery)
-    draw_txt(screen, continue_button.text_state, 19, white, continue_button.rect.centerx, continue_button.rect.centery - 20) """
-    
+    end_of_game_loop_button_render(screen, screen_1_buttons)
     
     pygame.display.flip()
 
@@ -281,11 +270,24 @@ pygame.display.flip()
 while running: 
 
     clock.tick(fps)
+    inital_button_state = hi_display_button.state
 
     for event in pygame.event.get():
-        Button.button_click(manual_alt_az_button, pygame.mouse.get_pos())
-        Button.button_click(auto_alt_az_button, pygame.mouse.get_pos())
-        Button.button_click(hi_display_button, pygame.mouse.get_pos())
+        
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            Button.button_click(manual_alt_az_button, pygame.mouse.get_pos())
+            Button.button_click(auto_alt_az_button, pygame.mouse.get_pos())
+            Button.button_click(hi_display_button, pygame.mouse.get_pos())
+
+
+            if hi_display_button.state == True: 
+
+                equatorial_coordinates = virgo.equatorial(30, 210, location_lat, location_lon, location_elevation)
+
+                virgo.map_hi(equatorial_coordinates[0], equatorial_coordinates[1])
+
+                hi_display_button.state = False 
+                hi_display_button.button_click(pygame.mouse.get_pos())
 
         
 
@@ -294,29 +296,47 @@ while running:
             print("Program will hult now!")
             #raises basic error so the program will stop 
             raise WindowsError
-        
-        if hi_display_button.state == True: 
-
-            equatorial_coordinates = virgo.equatorial(30, 210, location_lat, location_lon, location_elevation)
-
-            virgo.map_hi(equatorial_coordinates[0], equatorial_coordinates[1])
-        
 
 
+    end_of_game_loop_button_render(screen, screen_2_buttons)
 
-    screen.fill(white)
-    screen_2_buttons.update()
-    screen_2_buttons.draw(screen)
+
     pygame.display.flip()
 
         
 
 
+    """     screen_2_buttons.update()
+    Button.cursor_hover(manual_alt_az_button, pygame.mouse.get_pos())
+    Button.cursor_hover(auto_alt_az_button, pygame.mouse.get_pos())
+    Button.cursor_hover(hi_display_button, pygame.mouse.get_pos())
+   
+    screen.fill(white)
+    screen_2_buttons.draw(screen)
+   
+
+    Button.draw_basic_button_text(manual_alt_az_button)
+    Button.draw_basic_button_text(auto_alt_az_button)
+    Button.draw_basic_button_text(hi_display_button) """
 
 
 
+""" 
+    Button.cursor_hover(color_button, pygame.mouse.get_pos())
+    Button.cursor_hover(skip_button, pygame.mouse.get_pos())
+    Button.cursor_hover(continue_button, pygame.mouse.get_pos())
+    Button.cursor_hover(location_settings_button, pygame.mouse.get_pos())
 
+    screen.fill(white)
+    screen_1_buttons.update()
+    screen_1_buttons.draw(screen)
 
+    Button.draw_basic_button_text(color_button)
+    Button.draw_basic_button_text(continue_button)
+    Button.draw_basic_button_text(skip_button)
+    Button.draw_basic_button_text(location_settings_button)
+
+ """
 
     
 
