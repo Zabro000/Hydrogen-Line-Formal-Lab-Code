@@ -4,6 +4,8 @@ import time
 import pygame
 import astropy
 import operator
+from Phidget22.Phidget import *
+from Phidget22.Devices.Spatial import *
 
 
 ### pygame varibles
@@ -72,6 +74,10 @@ default_location_parameters = {
     'height': location_elevation
 }
 
+#Phidget spatial sensor code
+attachment_time = 5 * 1000
+
+
 #starting pygame
 pygame.init()
 pygame.mixer.init()
@@ -121,17 +127,10 @@ class Button(pygame.sprite.Sprite):
 
 
     def update(self):
+        ...
 
 
         #Updates the button states so if I change the state of the button manually its color wont be weird 
-        if self.state == True:
-            self.current_color = self.colors['on']
-            self.image.fill(self.current_color)
-            self.text_state = "selected"
-        else:
-            self.current_color = self.colors['off']
-            self.image.fill(self.current_color)
-            self.text_state = "off"
         
    
 
@@ -165,6 +164,8 @@ class Button(pygame.sprite.Sprite):
              self.state = operator.not_(self.state)
 
              return True 
+         
+         return False
              
 
     
@@ -175,8 +176,8 @@ class Button(pygame.sprite.Sprite):
             self.image.fill(self.current_color)
 
     def draw_basic_button_text(self):
-        draw_txt(screen, self.button_text, 19, white, self.rect.centerx, self.rect.centery)
-        draw_txt(screen, self.text_state, 19, white, self.rect.centerx, self.rect.centery - 20)
+        draw_txt(screen, self.button_text, 19, white, self.rect.centerx, self.rect.centery -20)
+        draw_txt(screen, self.text_state, 19, white, self.rect.centerx, self.rect.centery)
 
 
 
@@ -191,7 +192,7 @@ def parse_time() -> str:
 
     return virgo_time_string
 
-
+### handels the end of the game loop and drawing all th buttons
 def end_of_game_loop_button_render(general_screen, button_group) -> None:
     button_group.update()
 
@@ -267,9 +268,11 @@ while running:
 
 running = True 
 
-manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 300, screen_height/2 - 300)
-auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 300, screen_height/2 - 100)
-hi_display_button = Button("Show Hydrogen", screen_width/2 - 200, screen_height/2)
+manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 600, screen_height/2 - 300)
+auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 600, screen_height/2 + 100)
+hi_display_button = Button("Show Hydrogen", screen_width/2 - 300, screen_height/2 - 100)
+test_spatial_phidget_button = Button("Test Phidget", screen_width/2 - 600, screen_height/2 - 100)
+
 
 
 screen_2_buttons = pygame.sprite.Group()
@@ -277,6 +280,8 @@ screen_2_buttons = pygame.sprite.Group()
 screen_2_buttons.add(manual_alt_az_button)
 screen_2_buttons.add(auto_alt_az_button)
 screen_2_buttons.add(hi_display_button)
+screen_2_buttons.add(test_spatial_phidget_button)
+
 
 screen.fill(white)
 pygame.display.flip()
@@ -284,7 +289,6 @@ pygame.display.flip()
 while running: 
 
     clock.tick(fps)
-    inital_button_state = hi_display_button.state
 
     for event in pygame.event.get():
         
@@ -292,17 +296,26 @@ while running:
             Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
             Button.on_or_off_button_click(auto_alt_az_button, pygame.mouse.get_pos())
             temp_state = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
+            temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
 
 
             #Updating the button's state mid loop required that stuff in the update method
-            if hi_display_button.state == True: 
+            if temp_state == True: 
 
                 equatorial_coordinates = virgo.equatorial(30, 210, location_lat, location_lon, location_elevation)
 
                 virgo.map_hi(equatorial_coordinates[0], equatorial_coordinates[1])
 
-                hi_display_button.state = False 
-                hi_display_button.on_or_off_button_click(pygame.mouse.get_pos())
+            if temp_state_2 == True: 
+                angle_sensor = Spatial()
+                try:
+                    angle_sensor.openWaitForAttachment(attachment_time)
+                except PhidgetException as error:
+                    print("The phidget is probably not attached, ", error)
+
+
+
+
 
         
 
@@ -317,8 +330,6 @@ while running:
 
 
     pygame.display.flip()
-
-        
 
 
     """     screen_2_buttons.update()
