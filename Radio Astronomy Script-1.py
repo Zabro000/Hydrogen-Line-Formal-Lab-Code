@@ -205,6 +205,9 @@ class Button(pygame.sprite.Sprite):
         draw_txt(screen, self.button_text, 19, white, self.rect.centerx, self.rect.centery -20)
         draw_txt(screen, self.text_state, 19, white, self.rect.centerx, self.rect.centery)
 
+
+### Normal functions:
+
 def output_data_file_name(sdr_gain = None, coordinates_dict = None, observation_time = None) -> str:
 
     if sdr_gain == None: 
@@ -235,8 +238,6 @@ def output_data_file_name(sdr_gain = None, coordinates_dict = None, observation_
     file_name = f"Hydrogen Line Observation Data taken in {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, SDR gain is {sdr_gain}, ra and dec coordinates are {ra}, {dec}.dat"
 
     return file_name
-
-
 
 
 def parse_time() -> str:
@@ -270,6 +271,8 @@ def draw_txt(surf, text, size, color, x, y):
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
 
+
+### First game loop for the starting screen
 color_button = Button("Night Mode", screen_width/2, screen_height/2,  )
 skip_button = Button("Skip Settings", screen_width/2 - 300, screen_height/2)
 continue_button = Button("Continue", screen_width/2, screen_height/2 + 200)
@@ -337,8 +340,6 @@ while running:
             
             print(location_settings_user_input)
             
-
-
     
     screen.fill(main_screen_color)
 
@@ -356,8 +357,6 @@ while running:
 
 
 ### Second loop for getting the observation ready
-
-
 manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 600, screen_height/2 - 300)
 auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 600, screen_height/2 + 100)
 hi_display_button = Button("Show Hydrogen Map", screen_width/2 - 300, screen_height/2 - 100)
@@ -387,10 +386,17 @@ while running:
     clock.tick(fps)
 
     for event in pygame.event.get():
+
+        if event.type == pygame.QUIT:
+            running = False
+            print("Program will hult now!")
+            #raises basic error so the program will stop 
+            raise WindowsError
+
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
-            check_state_2 =Button.on_or_off_button_click(auto_alt_az_button, pygame.mouse.get_pos())
+            click_state_2 =Button.on_or_off_button_click(auto_alt_az_button, pygame.mouse.get_pos())
             temp_state = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
             temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
             temp_state_3 = Button.doer_button_click(run_observation_button, pygame.mouse.get_pos())
@@ -400,8 +406,8 @@ while running:
             if temp_state == True: 
 
                 equatorial_coordinates = virgo.equatorial(30, 210, location_lat, location_lon, location_elevation)
-
                 virgo.map_hi(equatorial_coordinates[0], equatorial_coordinates[1])
+
 
             if temp_state_2 == True: 
                 angle_sensor = Spatial()
@@ -412,7 +418,7 @@ while running:
                 else:
                     print("The angle sensor is connected!")
 
-            if manual_alt_az_button.state == True and check_state_2 == True:
+            if manual_alt_az_button.state == True and click_state_2 == True:
                 ...
 
 
@@ -423,6 +429,7 @@ while running:
                 final_observing_values['ra_dec'] = observation_ra_dec
                 final_observing_values['az_alt'] = observation_az_alt
                 output_name = output_data_file_name()
+                print(output_name)
 
                 try: 
                     virgo.observe(final_observing_values, 'wola', output_name)
@@ -430,58 +437,12 @@ while running:
                     print("Check if the SDR is connected")
             
 
-        if event.type == pygame.QUIT:
-            running = False
-            print("Program will hult now!")
-            #raises basic error so the program will stop 
-            raise WindowsError
-
-
     screen.fill(main_screen_color)
 
     end_of_game_loop_button_render(screen, screen_2_buttons)
 
-
     pygame.display.flip()
 
-
-    """     screen_2_buttons.update()
-    Button.cursor_hover(manual_alt_az_button, pygame.mouse.get_pos())
-    Button.cursor_hover(auto_alt_az_button, pygame.mouse.get_pos())
-    Button.cursor_hover(hi_display_button, pygame.mouse.get_pos())
-   
-    screen.fill(white)
-    screen_2_buttons.draw(screen)
-   
-
-    Button.draw_basic_button_text(manual_alt_az_button)
-    Button.draw_basic_button_text(auto_alt_az_button)
-    Button.draw_basic_button_text(hi_display_button) """
-
-
-
-""" 
-    Button.cursor_hover(color_button, pygame.mouse.get_pos())
-    Button.cursor_hover(skip_button, pygame.mouse.get_pos())
-    Button.cursor_hover(continue_button, pygame.mouse.get_pos())
-    Button.cursor_hover(location_settings_button, pygame.mouse.get_pos())
-
-    screen.fill(white)
-    screen_1_buttons.update()
-    screen_1_buttons.draw(screen)
-
-    Button.draw_basic_button_text(color_button)
-    Button.draw_basic_button_text(continue_button)
-    Button.draw_basic_button_text(skip_button)
-    Button.draw_basic_button_text(location_settings_button)
-
- """
-
-    
-
-        
-
-        
 
 test = Observation("testinggg", default_observing_values, default_location_parameters)
 
