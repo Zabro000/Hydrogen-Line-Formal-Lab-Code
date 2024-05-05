@@ -105,6 +105,8 @@ green = (23,255,69)
 light_green = (135,225,143)
 
 main_screen_color = white
+basic_text_color = black
+
 normal_button_colors = {'off': black, 'on': green, 'hover': light_green}
 night_mode_button_colors = {'off': black, 'on': red, 'hover': other_red}
 
@@ -283,11 +285,13 @@ screen_1_buttons.add(location_settings_button)
 
 
 running = True 
-screen.fill(white)
-pygame.display.flip()
-
 location_settings_text_state = False
 location_settings_user_input = " "
+
+
+screen.fill(main_screen_color)
+pygame.display.flip()
+
 while running:
     clock.tick(fps)
 
@@ -301,37 +305,36 @@ while running:
             raise WindowsError
         
         if event.type == pygame.MOUSEBUTTONDOWN:
+
             Button.on_or_off_button_click(color_button, pygame.mouse.get_pos())
             Button.on_or_off_button_click(skip_button, pygame.mouse.get_pos())
             Button.on_or_off_button_click(continue_button, pygame.mouse.get_pos())
-            check_state_1 = Button.on_or_off_button_click(location_settings_button, pygame.mouse.get_pos())
+            click_state_2 = Button.on_or_off_button_click(location_settings_button, pygame.mouse.get_pos())
 
-            if continue_button.state == True :
+            if continue_button.state == True:
                 running = False
 
-            if color_button.state == True:
-                color_button.colors = normal_button_colors
-            else:
-                color_button.colors = night_mode_button_colors
-
-            # These two if statements will make sure that this only runs if the button was turned on because the button needs to be pressed and the state of the button needs to be on
-            if location_settings_button.state == True and check_state_1 == True:
+            
+            #These two if statements will make sure that this only runs if the button was turned on because the button needs to be pressed and the state of the button needs to be on
+            if location_settings_button.state == True and click_state_2 == True:
                 print("click")
                 location_settings_text_state = True
             else:
                 location_settings_text_state = False 
 
 
+        #User input to change their location (lat, lon, elevation)
         if event.type == pygame.KEYDOWN and location_settings_text_state == True:
+
             if event.key == pygame.K_RETURN:
-                input_active = False
+                print("Varibles set!")
+
             elif event.key == pygame.K_BACKSPACE:
                 location_settings_user_input =  location_settings_user_input[:-1]
+
             else:
                 location_settings_user_input += event.unicode
             
-            draw_txt(screen, location_settings_user_input, 19, black, location_settings_button.x_position, location_settings_button.y_position)
-
             print(location_settings_user_input)
             
 
@@ -340,10 +343,13 @@ while running:
 
     
 
-    if location_settings_text_state == True:
-        draw_txt(screen, location_settings_user_input, 19, black, location_settings_button.x_position, location_settings_button.y_position - 100)
+    
+    screen.fill(main_screen_color)
 
-    screen.fill(white)
+    if location_settings_text_state == True:
+        draw_txt(screen, f"like (lat,lon,elv) {location_settings_user_input}", 19, basic_text_color, location_settings_button.x_position, location_settings_button.y_position + 50)
+
+    
 
     end_of_game_loop_button_render(screen, screen_1_buttons)
 
@@ -357,7 +363,6 @@ while running:
 
 ### Second loop for getting the observation ready
 
-running = True 
 
 manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 600, screen_height/2 - 300)
 auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 600, screen_height/2 + 100)
@@ -376,7 +381,11 @@ screen_2_buttons.add(test_spatial_phidget_button)
 screen_2_buttons.add(run_observation_button)
 
 
-screen.fill(white)
+
+running = True 
+
+
+screen.fill(main_screen_color)
 pygame.display.flip()
 
 while running: 
@@ -425,16 +434,7 @@ while running:
                     virgo.observe(final_observing_values, 'wola', output_name)
                 except:
                     print("Check if the SDR is connected")
-                
-
-
-
-
-
-
-
-
-        
+            
 
         if event.type == pygame.QUIT:
             running = False
@@ -443,7 +443,8 @@ while running:
             raise WindowsError
 
 
-    screen.fill(white)
+    screen.fill(main_screen_color)
+
     end_of_game_loop_button_render(screen, screen_2_buttons)
 
 
