@@ -339,17 +339,11 @@ while running:
             
 
 
-        
-
-    
-
     
     screen.fill(main_screen_color)
 
     if location_settings_text_state == True:
-        draw_txt(screen, f"like (lat,lon,elv) {location_settings_user_input}", 19, basic_text_color, location_settings_button.x_position, location_settings_button.y_position + 50)
-
-    
+        draw_txt(screen, f"like: lat,lon,elv {location_settings_user_input}", 19, basic_text_color, location_settings_button.x_position, location_settings_button.y_position + 50)
 
     end_of_game_loop_button_render(screen, screen_1_buttons)
 
