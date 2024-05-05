@@ -255,7 +255,6 @@ def end_of_game_loop_button_render(general_screen, button_group) -> None:
     for button in button_group:
         Button.cursor_hover(button, pygame.mouse.get_pos())
 
-    general_screen.fill(white)
     button_group.draw(screen)
 
     for button in button_group: 
@@ -286,6 +285,9 @@ screen_1_buttons.add(location_settings_button)
 running = True 
 screen.fill(white)
 pygame.display.flip()
+
+location_settings_text_state = False
+location_settings_user_input = " "
 while running:
     clock.tick(fps)
 
@@ -315,9 +317,38 @@ while running:
             # These two if statements will make sure that this only runs if the button was turned on because the button needs to be pressed and the state of the button needs to be on
             if location_settings_button.state == True and check_state_1 == True:
                 print("click")
+                location_settings_text_state = True
+            else:
+                location_settings_text_state = False 
+
+
+        if event.type == pygame.KEYDOWN and location_settings_text_state == True:
+            if event.key == pygame.K_RETURN:
+                input_active = False
+            elif event.key == pygame.K_BACKSPACE:
+                location_settings_user_input =  location_settings_user_input[:-1]
+            else:
+                location_settings_user_input += event.unicode
+            
+            draw_txt(screen, location_settings_user_input, 19, black, location_settings_button.x_position, location_settings_button.y_position)
+
+            print(location_settings_user_input)
+            
+
+
+        
+
+    
+
+    if location_settings_text_state == True:
+        draw_txt(screen, location_settings_user_input, 19, black, location_settings_button.x_position, location_settings_button.y_position - 100)
+
+    screen.fill(white)
 
     end_of_game_loop_button_render(screen, screen_1_buttons)
-    
+
+
+
     pygame.display.flip()
 
 
@@ -412,6 +443,7 @@ while running:
             raise WindowsError
 
 
+    screen.fill(white)
     end_of_game_loop_button_render(screen, screen_2_buttons)
 
 
