@@ -235,7 +235,7 @@ def output_data_file_name(sdr_gain = None, coordinates_dict = None, observation_
     ra = coordinates_dict['right ascension']
     dec = coordinates_dict['declination']
 
-    file_name = f"Hydrogen Line Observation Data taken in {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, SDR gain is {sdr_gain}, ra and dec coordinates are {ra}, {dec}.dat"
+    file_name = f"Hydrogen Line Observation Data taken in {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, observation time is {observation_time}(s), SDR gain is {sdr_gain}(dB), ra and dec coordinates are {ra}(hr), {dec}(deg).dat"
 
     return file_name
 
@@ -276,7 +276,7 @@ def draw_txt(surf, text, size, color, x, y):
 color_button = Button("Night Mode", screen_width/2, screen_height/2,  )
 skip_button = Button("Skip Settings", screen_width/2 - 300, screen_height/2)
 continue_button = Button("Continue", screen_width/2, screen_height/2 + 200)
-location_settings_button = Button("Set Location", screen_width/2 -300, screen_height/2 + 200)
+location_settings_button = Button("Change Location", screen_width/2 -300, screen_height/2 + 200)
 
 
 screen_1_buttons = pygame.sprite.Group()
@@ -362,6 +362,7 @@ auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 600, screen_height/2
 hi_display_button = Button("Show Hydrogen Map", screen_width/2 - 300, screen_height/2 - 100)
 test_spatial_phidget_button = Button("Test Phidget", screen_width/2 - 600, screen_height/2 - 100)
 run_observation_button = Button("Begin Observation", screen_width/2 + 600, screen_height/2 -100)
+change_observation_time_button = Button("Change Observation Time", screen_width/2 - 600, screen_height/2 + 300)
 
 
 
@@ -372,10 +373,15 @@ screen_2_buttons.add(auto_alt_az_button)
 screen_2_buttons.add(hi_display_button)
 screen_2_buttons.add(test_spatial_phidget_button)
 screen_2_buttons.add(run_observation_button)
+screen_2_buttons.add(change_observation_time_button)
 
 
 
 running = True 
+inital_time = time.time()
+final_time = time.time()
+wait_time = 10
+
 
 
 screen.fill(main_screen_color)
@@ -395,7 +401,7 @@ while running:
 
         
         if event.type == pygame.MOUSEBUTTONDOWN:
-            Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
+            click_state_1 =Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
             click_state_2 =Button.on_or_off_button_click(auto_alt_az_button, pygame.mouse.get_pos())
             temp_state = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
             temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
@@ -433,8 +439,9 @@ while running:
 
                 try: 
                     virgo.observe(final_observing_values, 'wola', output_name)
-                except:
+                except ModuleNotFoundError as error:
                     print("Check if the SDR is connected")
+                    print(error)
             
 
     screen.fill(main_screen_color)
