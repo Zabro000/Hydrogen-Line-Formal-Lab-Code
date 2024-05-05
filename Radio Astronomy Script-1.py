@@ -1,4 +1,3 @@
-
 import virgo
 import time
 import pygame
@@ -313,7 +312,8 @@ while running:
             else:
                 color_button.colors = night_mode_button_colors
 
-            if location_settings_button == True and check_state_1 == True:
+            # These two if statements will make sure that this only runs if the button was turned on because the button needs to be pressed and the state of the button needs to be on
+            if location_settings_button.state == True and check_state_1 == True:
                 print("click")
 
     end_of_game_loop_button_render(screen, screen_1_buttons)
