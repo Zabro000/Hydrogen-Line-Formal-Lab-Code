@@ -87,7 +87,6 @@ default_location_parameters = {
 attachment_time = 5 * 1000
 
 
-
 ### Pygame varibles
 screen_width = 1600
 screen_height = 900
@@ -264,6 +263,125 @@ def end_of_game_loop_button_render(general_screen, button_group) -> None:
         Button.draw_basic_button_text(button)
 
 
+
+
+def user_change_location_input_list_parse(raw_input, split_char = None) -> list:
+    stripped_input = raw_input.strip()
+
+    error_list = [0,0,0]
+
+    try:
+        splited_list = stripped_input.split(",")
+    except:
+        print("Bad list value")
+        return error_list
+    
+    if len(splited_list) != 3:
+        print("wrong number of inputs")
+        return error_list
+    else: 
+        return splited_list
+
+
+#Uses global varibles, just to keep things clean
+def user_change_location_parse(location_list) -> None:
+    global default_location_parameters
+    error_list = [0,0,0]
+    error_value = 0
+
+    if len(location_list) != 3:
+        default_location_parameters['height'] = error_value
+        default_location_parameters['lat'] = error_value
+        default_location_parameters['lon'] = error_value
+        return None 
+    
+    #This handles if things arent numbers 
+    try: 
+        default_location_parameters['lat'] = float(location_list[0])
+        default_location_parameters['lon'] = float(location_list[1])
+        default_location_parameters['height'] = float(location_list[2])
+    except:
+        default_location_parameters['height'] = error_value
+        default_location_parameters['lat'] = error_value
+        default_location_parameters['lon'] = error_value
+    finally:
+        print("The location dict ", default_location_parameters)
+        return None 
+
+
+
+
+def user_change_az_alt_list_parse(raw_input, split_char = None) -> list:
+    stripped_input = raw_input.strip()
+
+    error_list = [0,0]
+
+    try:
+        splited_list = stripped_input.split(",")
+    except:
+        print("Bad list value")
+        return error_list
+    
+    if len(splited_list) != 2:
+        print("wrong number of inputs")
+        return error_list
+    else: 
+        return splited_list
+
+
+#This will handle everything and using all the coordinates
+def user_change_az_alt_parse(az_alt_input_list) -> None:
+    global default_observation_coordinates
+    global default_location_parameters
+    error_value = 0
+    error_list = [0,0]
+    az_alt_list = []
+    ra_dec_list = []
+
+    if len(az_alt_input_list) != 2:
+        default_observation_coordinates['azimuth'] = error_value
+        default_observation_coordinates['altitude'] = error_value
+        default_observation_coordinates['azimuth and altitude list'] = error_list
+        default_observation_coordinates['right ascension'] = error_value
+        default_observation_coordinates['declination'] = error_value
+        default_observation_coordinates['right ascension and declination list'] = error_list
+        print("Not enough values: ", default_observation_coordinates)
+        return None 
+    
+    try: 
+        default_observation_coordinates['azimuth'] = float(az_alt_input_list[0])
+        default_observation_coordinates['altitude'] = float(az_alt_input_list[1])
+    except:
+        default_observation_coordinates['azimuth'] = error_value
+        default_observation_coordinates['altitude'] = error_value
+        default_observation_coordinates['azimuth and altitude list'] = error_list
+        default_observation_coordinates['right ascension'] = error_value
+        default_observation_coordinates['declination'] = error_value
+        default_observation_coordinates['right ascension and declination list'] = error_list
+        print("Bad values: ", default_observation_coordinates)
+        return None
+    
+    az_alt_list = [default_observation_coordinates['azimuth'], default_observation_coordinates['altitude']]
+    default_observation_coordinates['azimuth and altitude list'] = az_alt_list
+
+    ra_dec_list = virgo.equatorial(default_observation_coordinates['altitude'], default_observation_coordinates['azimuth'], 
+                     default_location_parameters['lat'], default_location_parameters['lon'], default_location_parameters['height'])
+    
+   
+    default_observation_coordinates['right ascension'] = ra_dec_list[0]
+    default_observation_coordinates['declination'] = ra_dec_list[1]
+
+    ra_dec_list = [default_observation_coordinates['right ascension'], default_observation_coordinates['declination']]
+    default_observation_coordinates['right ascension and declination list'] = ra_dec_list
+
+    print("Updating observtion coordinates went great! ", default_observation_coordinates)
+
+    
+
+
+    
+
+
 def draw_txt(surf, text, size, color, x, y):
     font = pygame.font.Font(font_name, size)
     text_surface = font.render(text, True, color)
@@ -279,6 +397,7 @@ continue_button = Button("Continue", screen_width/2, screen_height/2 + 200)
 location_settings_button = Button("Change Location", screen_width/2 -300, screen_height/2 + 200)
 
 
+
 screen_1_buttons = pygame.sprite.Group()
 screen_1_buttons.add(color_button)
 screen_1_buttons.add(skip_button)
@@ -290,6 +409,9 @@ screen_1_buttons.add(location_settings_button)
 running = True 
 location_settings_text_state = False
 location_settings_user_input = " "
+location_settings_parsed_1 = " "
+
+location_settings_iterate = 0
 
 
 screen.fill(main_screen_color)
@@ -320,7 +442,7 @@ while running:
             
             #These two if statements will make sure that this only runs if the button was turned on because the button needs to be pressed and the state of the button needs to be on
             if location_settings_button.state == True and click_state_2 == True:
-                print("click")
+                print("on")
                 location_settings_text_state = True
             else:
                 location_settings_text_state = False 
@@ -331,7 +453,10 @@ while running:
 
             if event.key == pygame.K_RETURN:
                 print("Varibles set!")
-
+                location_settings_parsed_1 = user_change_location_input_list_parse(location_settings_user_input)
+                print("location settings parse", location_settings_parsed_1)
+                user_change_location_parse(location_settings_parsed_1)
+                
             elif event.key == pygame.K_BACKSPACE:
                 location_settings_user_input =  location_settings_user_input[:-1]
 
@@ -363,24 +488,29 @@ hi_display_button = Button("Show Hydrogen Map", screen_width/2 - 300, screen_hei
 test_spatial_phidget_button = Button("Test Phidget", screen_width/2 - 600, screen_height/2 - 100)
 run_observation_button = Button("Begin Observation", screen_width/2 + 600, screen_height/2 -100)
 change_observation_time_button = Button("Change Observation Time", screen_width/2 - 600, screen_height/2 + 300)
-
+select_file_to_plot_button = Button("Plot Selected File", screen_width/2 + 600, screen_height/2 + 300)
+plot_just_finished_observation_button = Button("Plot Data", screen_width/2 + 600, screen_height/2 + 100)
 
 
 screen_2_buttons = pygame.sprite.Group()
-
 screen_2_buttons.add(manual_alt_az_button)
 screen_2_buttons.add(auto_alt_az_button)
 screen_2_buttons.add(hi_display_button)
 screen_2_buttons.add(test_spatial_phidget_button)
 screen_2_buttons.add(run_observation_button)
 screen_2_buttons.add(change_observation_time_button)
-
+screen_2_buttons.add(select_file_to_plot_button)
+screen_2_buttons.add(plot_just_finished_observation_button)
 
 
 running = True 
 inital_time = time.time()
 final_time = time.time()
 wait_time = 10
+completed_data_file_name = None
+manual_alt_az_text_state = False 
+manual_alt_az_user_input = " "
+manual_alt_az_user_input_parsed = " "
 
 
 
@@ -403,13 +533,20 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             click_state_1 =Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
             click_state_2 =Button.on_or_off_button_click(auto_alt_az_button, pygame.mouse.get_pos())
-            temp_state = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
+            temp_state_1 = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
             temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
             temp_state_3 = Button.doer_button_click(run_observation_button, pygame.mouse.get_pos())
 
 
+            #This handles the manual alt and az input from the user
+            if manual_alt_az_button.state == True and click_state_1 == True:
+                manual_alt_az_text_state = True
+            else:
+                manual_alt_az_text_state = False
+
+            
             #Updating the button's state mid loop required that stuff in the update method
-            if temp_state == True: 
+            if temp_state_1 == True: 
 
                 equatorial_coordinates = virgo.equatorial(30, 210, location_lat, location_lon, location_elevation)
                 virgo.map_hi(equatorial_coordinates[0], equatorial_coordinates[1])
@@ -424,27 +561,49 @@ while running:
                 else:
                     print("The angle sensor is connected!")
 
-            if manual_alt_az_button.state == True and click_state_2 == True:
-                ...
-
 
             if temp_state_3 == True:
+                # change this so all the observation parameters come from their dict and not from the inputted varbiles
                 final_observing_values['loc']
                 final_observing_values['duration'] = observing_time
                 final_observing_values['rf_gain'] = sdr_rf_gain
                 final_observing_values['ra_dec'] = observation_ra_dec
                 final_observing_values['az_alt'] = observation_az_alt
-                output_name = output_data_file_name()
-                print(output_name)
+                completed_data_file_name = output_data_file_name()
+                print(completed_data_file_name)
 
                 try: 
-                    virgo.observe(final_observing_values, 'wola', output_name)
+                    virgo.observe(final_observing_values, 'wola', completed_data_file_name)
                 except ModuleNotFoundError as error:
                     print("Check if the SDR is connected")
                     print(error)
+
+
+        if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
+
+            if event.key == pygame.K_RETURN:
+                print("Varibles set!")
+                manual_alt_az_user_input = user_change_az_alt_list_parse(manual_alt_az_user_input)
+                print("location settings parse", manual_alt_az_user_input)
+                user_change_az_alt_parse(manual_alt_az_user_input)
+                
+            elif event.key == pygame.K_BACKSPACE:
+                manual_alt_az_user_input =  manual_alt_az_user_input[:-1]
+
+            else:
+                manual_alt_az_user_input += event.unicode
+            
+            print(manual_alt_az_user_input)
+
             
 
+
+
+
     screen.fill(main_screen_color)
+
+    if manual_alt_az_text_state == True:
+        draw_txt(screen, f"like: az,alt {manual_alt_az_user_input}", 19, basic_text_color, manual_alt_az_button.x_position, manual_alt_az_button.y_position + 50)
 
     end_of_game_loop_button_render(screen, screen_2_buttons)
 

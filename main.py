@@ -69,5 +69,6 @@ cloud = {
 fluffy = 0.0090
 
 cloud['fluffy'] = fluffy
-print(cloud['fluffy'])
+cloud[0]
+print(cloud[0])
 
