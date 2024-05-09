@@ -547,9 +547,7 @@ while running:
             
             #Updating the button's state mid loop required that stuff in the update method
             if temp_state_1 == True: 
-
-                equatorial_coordinates = virgo.equatorial(30, 210, location_lat, location_lon, location_elevation)
-                virgo.map_hi(equatorial_coordinates[0], equatorial_coordinates[1])
+                virgo.map_hi(default_observation_coordinates['right ascension'], default_observation_coordinates['declination'])
 
 
             if temp_state_2 == True: 
@@ -583,9 +581,9 @@ while running:
 
             if event.key == pygame.K_RETURN:
                 print("Varibles set!")
-                manual_alt_az_user_input = user_change_az_alt_list_parse(manual_alt_az_user_input)
-                print("location settings parse", manual_alt_az_user_input)
-                user_change_az_alt_parse(manual_alt_az_user_input)
+                manual_alt_az_user_input_parsed = user_change_az_alt_list_parse(manual_alt_az_user_input)
+                print("location settings parse", manual_alt_az_user_input_parsed)
+                user_change_az_alt_parse(manual_alt_az_user_input_parsed)
                 
             elif event.key == pygame.K_BACKSPACE:
                 manual_alt_az_user_input =  manual_alt_az_user_input[:-1]
