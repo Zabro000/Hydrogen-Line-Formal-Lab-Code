@@ -266,18 +266,18 @@ def end_of_game_loop_button_render(general_screen, button_group) -> None:
 
 
 def user_change_location_input_list_parse(raw_input, split_char = None) -> list:
-    stripped_input = raw_input.strip()
 
     error_list = [0,0,0]
 
     try:
+        stripped_input = raw_input.strip()
         splited_list = stripped_input.split(",")
     except:
-        print("Bad list value")
+        print("Bad input values.")
         return error_list
     
     if len(splited_list) != 3:
-        print("wrong number of inputs")
+        print("Wrong number of inputs.")
         return error_list
     else: 
         return splited_list
@@ -293,6 +293,7 @@ def user_change_location_parse(location_list) -> None:
         default_location_parameters['height'] = error_value
         default_location_parameters['lat'] = error_value
         default_location_parameters['lon'] = error_value
+        print("Not enough values: ", default_location_parameters)
         return None 
     
     #This handles if things arent numbers 
@@ -304,26 +305,28 @@ def user_change_location_parse(location_list) -> None:
         default_location_parameters['height'] = error_value
         default_location_parameters['lat'] = error_value
         default_location_parameters['lon'] = error_value
+        print("Bad values: ",default_location_parameters)
     finally:
-        print("The location dict ", default_location_parameters)
+        print("Done updating the location parameters! ", default_location_parameters)
         return None 
 
 
 
 
 def user_change_az_alt_list_parse(raw_input, split_char = None) -> list:
-    stripped_input = raw_input.strip()
+    
 
     error_list = [0,0]
 
     try:
+        stripped_input = raw_input.strip()
         splited_list = stripped_input.split(",")
     except:
-        print("Bad list value")
+        print("Bad list values.")
         return error_list
     
     if len(splited_list) != 2:
-        print("wrong number of inputs")
+        print("Wrong number of inputs.")
         return error_list
     else: 
         return splited_list
@@ -374,7 +377,7 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
     ra_dec_list = [default_observation_coordinates['right ascension'], default_observation_coordinates['declination']]
     default_observation_coordinates['right ascension and declination list'] = ra_dec_list
 
-    print("Updating observtion coordinates went great! ", default_observation_coordinates)
+    print("Done updating observtion coordinates! ", default_observation_coordinates)
 
     
 
