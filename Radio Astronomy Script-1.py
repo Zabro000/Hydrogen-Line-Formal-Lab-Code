@@ -103,10 +103,12 @@ dark_red = (65,3,0)
 green = (23,255,69)
 light_green = (135,225,143)
 
+purple = (187,153,255)
+
 main_screen_color = white
 basic_text_color = black
 
-normal_button_colors = {'off': black, 'on': green, 'hover': light_green}
+normal_button_colors = {'off': black, 'on': green, 'hover': purple}
 night_mode_button_colors = {'off': black, 'on': red, 'hover': other_red}
 
 ### Starting pygame
@@ -261,7 +263,6 @@ def end_of_game_loop_button_render(general_screen, button_group) -> None:
 
     for button in button_group: 
         Button.draw_basic_button_text(button)
-
 
 
 
@@ -510,7 +511,7 @@ running = True
 inital_time = time.time()
 final_time = time.time()
 wait_time = 10
-completed_data_file_name = None
+observation_output_data_file_name = None
 manual_alt_az_text_state = False 
 manual_alt_az_user_input = " "
 manual_alt_az_user_input_parsed = " "
@@ -539,6 +540,7 @@ while running:
             temp_state_1 = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
             temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
             temp_state_3 = Button.doer_button_click(run_observation_button, pygame.mouse.get_pos())
+            temp_state_4 = Button.doer_button_click(plot_just_finished_observation_button, pygame.mouse.get_pos())
 
 
             #This handles the manual alt and az input from the user
@@ -548,11 +550,12 @@ while running:
                 manual_alt_az_text_state = False
 
             
-            #Updating the button's state mid loop required that stuff in the update method
+            #Shows the predicited hydrogen line strength at the location the telescope is pointing at
             if temp_state_1 == True: 
                 virgo.map_hi(default_observation_coordinates['right ascension'], default_observation_coordinates['declination'])
 
 
+            #Tries to initalize the angle phidget sensor
             if temp_state_2 == True: 
                 angle_sensor = Spatial()
                 try:
@@ -563,21 +566,36 @@ while running:
                     print("The angle sensor is connected!")
 
 
+            #Button to run an observation
             if temp_state_3 == True:
-                # change this so all the observation parameters come from their dict and not from the inputted varbiles
                 final_observing_values['loc']
                 final_observing_values['duration'] = observing_time
                 final_observing_values['rf_gain'] = sdr_rf_gain
                 final_observing_values['ra_dec'] = observation_ra_dec
                 final_observing_values['az_alt'] = observation_az_alt
-                completed_data_file_name = output_data_file_name()
-                print(completed_data_file_name)
+                observation_output_data_file_name = output_data_file_name()
+                print(observation_output_data_file_name)
 
                 try: 
-                    virgo.observe(final_observing_values, 'wola', completed_data_file_name)
+                    virgo.observe(final_observing_values, 'wola', observation_output_data_file_name)
                 except ModuleNotFoundError as error:
                     print("Check if the SDR is connected")
                     print(error)
+
+            
+            #This button is to plat the code
+            if temp_state_4 == True: 
+
+                try: 
+                    virgo.plot(obs_parameters= default_observing_values, n = 20, m =35, f_rest= hydrogen_line_freq,
+                                vlsr=False, meta=False, avg_ylim=(-5,15), cal_ylim=(-20,260), obs_file= observation_output_data_file_name, 
+                                rfi=[(1419.2e6, 1419.3e6), (1420.8e6, 1420.9e6)], dB=True, spectra_csv='spectrum.csv', plot_file='plot.png')
+                    
+                except Exception as error: 
+                    print("The SDR may not be connnected or no observation has been done while this was open")
+                    print(error)
+                
+
 
 
         if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
