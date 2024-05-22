@@ -21,6 +21,7 @@ ra_dec = None
 az_alt = None
 data_file_name = "Test data.dat"
 
+#initalizing dicts that is required for the obseravtion and ploting data
 default_observing_values = {
     'dev_args': '',
     'rf_gain': sdr_rf_gain,
@@ -51,7 +52,7 @@ final_observing_values = {
     'az_alt': ''
 }
 
-### Varibles for the Coordinates
+### Varibles and dicts for the astronomical coordinates
 observation_ra = None 
 observation_dec = None 
 observation_ra_dec = [observation_ra, observation_dec]
@@ -69,7 +70,7 @@ default_observation_coordinates = {
 }
 
 
-### location varibles
+### Initalizing location varibles
 location_lat = 51
 location_lon = -114
 location_elevation = 1420 #m
@@ -83,7 +84,7 @@ default_location_parameters = {
 
 
 
-### Phidget spatial sensor code
+### Phidget spatial sensor attachment time
 attachment_time = 5 * 1000
 
 
@@ -108,18 +109,19 @@ purple = (187,153,255)
 main_screen_color = white
 basic_text_color = black
 
+#Using a dict to keep track of the different colors needed for each situation or state
 normal_button_colors = {'off': black, 'on': green, 'hover': purple}
 night_mode_button_colors = {'off': black, 'on': red, 'hover': other_red}
 
 ### Starting pygame
 pygame.init()
-pygame.mixer.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Hydrogen Line")
 clock = pygame.time.Clock()
 font_name = pygame.font.match_font('calibri')
 
 
+#Class for the on screen buttons
 class Button(pygame.sprite.Sprite):
     
 
@@ -134,7 +136,7 @@ class Button(pygame.sprite.Sprite):
         self.y_position = position_y 
         self.button_text = button_text
 
-
+        #Use normal colors if none is inputted
         if colors is None:
             self.colors = normal_button_colors
         #Checks that the color inputted is only a dict
@@ -142,13 +144,14 @@ class Button(pygame.sprite.Sprite):
             self.colors = colors
         else:
             raise TypeError
-
+        
+        #Set state of the button to off if none is given
         if state is None:
             self.state = False
         else:
             self.state = bool(state)
         
-
+        #Depending on the state, change the text and assign what the color is right now from the dict
         if self.state == False:
             self.text_state = "off"
             self.current_color = self.colors['off']
@@ -162,11 +165,12 @@ class Button(pygame.sprite.Sprite):
     def update(self):
         ...
 
-
+    #Method to handle the buttons that hold an on or off state
     def on_or_off_button_click(self, mouse_position):
+         #This if statement checks to see of the mouse is over the button
          if self.rect.left <= mouse_position[0] <= self.rect.left + self.button_width and self.rect.top <= mouse_position[1] <= self.rect.bottom:
                 
-                # flips the button state to the opposite bool
+                #flips the button state to the opposite bool, if the current state was on, now it should be off
                 self.state = operator.not_(self.state)
 
 
@@ -180,12 +184,12 @@ class Button(pygame.sprite.Sprite):
                     self.image.fill(self.current_color)
                     self.text_state = "off"
 
-                # Return true so the button if statements in the while loop can run 
+                #Return true so the button if statements in the while loop can run 
                 return True
-         
+         #Return false so the if statments later to exicute the code assosiated with each button depending on its state and if it was pressed will not run
          return False
 
-
+    #Method to handle buttons that exicute code when pressed regardless of their state
     def doer_button_click(self, mouse_position):
          if self.rect.left <= mouse_position[0] <= self.rect.left + self.button_width and self.rect.top <= mouse_position[1] <= self.rect.bottom:
              
@@ -195,13 +199,14 @@ class Button(pygame.sprite.Sprite):
          
          return False
              
-    
+    #Method to change the color of the button if the cursor is over the button
     def cursor_hover(self, mouse_position):
         if self.rect.left <= mouse_position[0] <= self.rect.left + self.button_width and self.rect.top <= mouse_position[1] <= self.rect.bottom:
             self.image.fill(self.colors['hover'])
         else:
             self.image.fill(self.current_color)
 
+    #Method that prints the button's text and its state
     def draw_basic_button_text(self):
         draw_txt(screen, self.button_text, 19, white, self.rect.centerx, self.rect.centery -20)
         draw_txt(screen, self.text_state, 19, white, self.rect.centerx, self.rect.centery)
@@ -209,6 +214,10 @@ class Button(pygame.sprite.Sprite):
 
 ### Normal functions:
 
+def screen_color_change(object) -> None:
+    ...
+
+#Function that outputs a unique name to the data collected based on the date and other parameters
 def output_data_file_name(sdr_gain = None, coordinates_dict = None, observation_time = None) -> str:
 
     if sdr_gain == None: 
@@ -240,7 +249,7 @@ def output_data_file_name(sdr_gain = None, coordinates_dict = None, observation_
 
     return file_name
 
-
+#Function that gets the time right now and returns it in a year, month, day format
 def parse_time() -> str:
     time_tuple = time.localtime()
     
@@ -252,22 +261,22 @@ def parse_time() -> str:
 
     return virgo_time_string
 
-### handels the end of the game loop and drawing all th buttons
+#Handles the end of the game loop, so everthing is updated
 def end_of_game_loop_button_render(general_screen, button_group) -> None:
     button_group.update()
 
     for button in button_group:
         Button.cursor_hover(button, pygame.mouse.get_pos())
 
-    button_group.draw(screen)
+    button_group.draw(general_screen)
 
     for button in button_group: 
         Button.draw_basic_button_text(button)
 
 
-
+#Function that handles user input to change the location of the observation
 def user_change_location_input_list_parse(raw_input, split_char = None) -> list:
-
+    #If the inputs are bad, instead of raising an error, just return an error list
     error_list = [0,0,0]
 
     try:
@@ -284,7 +293,7 @@ def user_change_location_input_list_parse(raw_input, split_char = None) -> list:
         return splited_list
 
 
-#Uses global varibles, just to keep things clean
+#After the parse function, this will run to update the location values in the dict.I use global varibles here, to keep things clean
 def user_change_location_parse(location_list) -> None:
     global default_location_parameters
     error_list = [0,0,0]
@@ -296,8 +305,7 @@ def user_change_location_parse(location_list) -> None:
         default_location_parameters['lon'] = error_value
         print("Not enough values: ", default_location_parameters)
         return None 
-    
-    #This handles if things arent numbers 
+
     try: 
         default_location_parameters['lat'] = float(location_list[0])
         default_location_parameters['lon'] = float(location_list[1])
@@ -306,17 +314,16 @@ def user_change_location_parse(location_list) -> None:
         default_location_parameters['height'] = error_value
         default_location_parameters['lat'] = error_value
         default_location_parameters['lon'] = error_value
-        print("Bad values: ",default_location_parameters)
+        print("Bad values: ", default_location_parameters)
     finally:
         print("Done updating the location parameters! ", default_location_parameters)
         return None 
 
 
 
-
+#Function that parses the user input of what alt and az the antenna is pointed at
 def user_change_az_alt_list_parse(raw_input, split_char = None) -> list:
     
-
     error_list = [0,0]
 
     try:
@@ -333,7 +340,7 @@ def user_change_az_alt_list_parse(raw_input, split_char = None) -> list:
         return splited_list
 
 
-#This will handle everything and using all the coordinates
+#After the parsing function runs, this will asign the inputted alt and az and then run it through a function that converts to ra and dec. All the new coordinates are updated in the dict.
 def user_change_az_alt_parse(az_alt_input_list) -> None:
     global default_observation_coordinates
     global default_location_parameters
@@ -366,8 +373,10 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
         return None
     
     az_alt_list = [default_observation_coordinates['azimuth'], default_observation_coordinates['altitude']]
+   
     default_observation_coordinates['azimuth and altitude list'] = az_alt_list
 
+   #Function that gets the ra and dec 
     ra_dec_list = virgo.equatorial(default_observation_coordinates['altitude'], default_observation_coordinates['azimuth'], 
                      default_location_parameters['lat'], default_location_parameters['lon'], default_location_parameters['height'])
     
@@ -380,18 +389,16 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
 
     print("Done updating observtion coordinates! ", default_observation_coordinates)
 
-    
 
-
-    
-
-
+#Mr.V's on screen text drawing function. It is really helpful!
 def draw_txt(surf, text, size, color, x, y):
     font = pygame.font.Font(font_name, size)
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
+
+
 
 
 ### First game loop for the starting screen
@@ -430,11 +437,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
             print("Program will hult now!")
-            #raises basic error so the program will stop 
+            #Raises basic error so the program will just stop 
             raise WindowsError
         
         if event.type == pygame.MOUSEBUTTONDOWN:
-
+            
+            #If the mouse was clicked, this runs through to see if the mouse was over a button 
             Button.on_or_off_button_click(color_button, pygame.mouse.get_pos())
             Button.on_or_off_button_click(skip_button, pygame.mouse.get_pos())
             Button.on_or_off_button_click(continue_button, pygame.mouse.get_pos())
@@ -447,23 +455,28 @@ while running:
             #These two if statements will make sure that this only runs if the button was turned on because the button needs to be pressed and the state of the button needs to be on
             if location_settings_button.state == True and click_state_2 == True:
                 print("on")
+
+                #Changes a state varbile so the code knows if the user wants to input text
                 location_settings_text_state = True
             else:
                 location_settings_text_state = False 
 
 
-        #User input to change their location (lat, lon, elevation)
+        #User input to change their location (lat, lon, elevation), if a key was hit and the state is true 
         if event.type == pygame.KEYDOWN and location_settings_text_state == True:
-
+            
+            #if the user hits 'enter' then the values inputted will be updated and parsed
             if event.key == pygame.K_RETURN:
                 print("Varibles set!")
                 location_settings_parsed_1 = user_change_location_input_list_parse(location_settings_user_input)
                 print("location settings parse", location_settings_parsed_1)
                 user_change_location_parse(location_settings_parsed_1)
                 
+            #if the user deletes a key, then remove the last character in the list
             elif event.key == pygame.K_BACKSPACE:
                 location_settings_user_input =  location_settings_user_input[:-1]
-
+            
+            #if anyother key is hit then add it to the end of the list
             else:
                 location_settings_user_input += event.unicode
             
@@ -472,6 +485,7 @@ while running:
     
     screen.fill(main_screen_color)
 
+    #Draw the user input for the location settings input only if the button for that is still on
     if location_settings_text_state == True:
         draw_txt(screen, f"like: lat,lon,elv {location_settings_user_input}", 19, basic_text_color, location_settings_button.x_position, location_settings_button.y_position + 50)
 
@@ -485,7 +499,7 @@ while running:
 
 
 
-### Second loop for getting the observation ready
+### Second loop for getting the observation ready, the functions for the user input is the same so there are only comments on the new bits
 manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 600, screen_height/2 - 300)
 auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 600, screen_height/2 + 100)
 hi_display_button = Button("Show Hydrogen Map", screen_width/2 - 300, screen_height/2 - 100)
@@ -550,7 +564,7 @@ while running:
                 manual_alt_az_text_state = False
 
             
-            #Shows the predicited hydrogen line strength at the location the telescope is pointing at
+            #Displays a map of the hydrogen line strength and a dot to show where the antenna is pointed at
             if temp_state_1 == True: 
                 virgo.map_hi(default_observation_coordinates['right ascension'], default_observation_coordinates['declination'])
 
@@ -566,7 +580,7 @@ while running:
                     print("The angle sensor is connected!")
 
 
-            #Button to run an observation
+            #Button that tries to run the actuall obseravtion
             if temp_state_3 == True:
                 final_observing_values['loc']
                 final_observing_values['duration'] = observing_time
@@ -583,7 +597,7 @@ while running:
                     print(error)
 
             
-            #This button is to plat the code
+            #Button that plots the most resent data while the script was open
             if temp_state_4 == True: 
 
                 try: 
@@ -614,10 +628,6 @@ while running:
             
             print(manual_alt_az_user_input)
 
-            
-
-
-
 
     screen.fill(main_screen_color)
 
@@ -627,6 +637,11 @@ while running:
     end_of_game_loop_button_render(screen, screen_2_buttons)
 
     pygame.display.flip()
+
+
+
+
+
 
 
 test = Observation("testinggg", default_observing_values, default_location_parameters)
