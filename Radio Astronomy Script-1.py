@@ -9,6 +9,7 @@ from Phidget22.Devices.Spatial import *
 
 ### Virgo and radio astronomy varibles
 observing_time = 60 # in seconds
+observation_start_time = 5 # in seconds
 sdr_rf_gain = 20
 if_gain = 25
 bb_gain = 18
@@ -580,7 +581,7 @@ while running:
                     print("The angle sensor is connected!")
 
 
-            #Button that tries to run the actuall obseravtion
+            #Button that tries to run the actual obseravtion
             if temp_state_3 == True:
                 final_observing_values['loc']
                 final_observing_values['duration'] = observing_time
@@ -591,7 +592,7 @@ while running:
                 print(observation_output_data_file_name)
 
                 try: 
-                    virgo.observe(final_observing_values, 'wola', observation_output_data_file_name)
+                    virgo.observe(final_observing_values, 'wola', observation_output_data_file_name,start_in = observation_start_time)
                 except ModuleNotFoundError as error:
                     print("Check if the SDR is connected")
                     print(error)
@@ -609,9 +610,7 @@ while running:
                     print("The SDR may not be connnected or no observation has been done while this was open")
                     print(error)
                 
-
-
-
+    
         if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
 
             if event.key == pygame.K_RETURN:
