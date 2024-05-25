@@ -246,7 +246,7 @@ def output_data_file_name(sdr_gain = None, coordinates_dict = None, observation_
     ra = coordinates_dict['right ascension']
     dec = coordinates_dict['declination']
 
-    file_name = f"Hydrogen Line Observation Data taken in {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, observation time is {observation_time}(s), SDR gain is {sdr_gain}(dB), ra and dec coordinates are {ra}(hr), {dec}(deg).dat"
+    file_name = f"HL Data;{year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration;{observation_time}(s), Gain;{sdr_gain}(dB), ra and dec;{ra}(hr), {dec}(deg).dat"
 
     return file_name
 
