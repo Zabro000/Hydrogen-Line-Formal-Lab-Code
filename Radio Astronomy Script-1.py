@@ -5,9 +5,10 @@ import astropy
 import operator
 from Phidget22.Phidget import *
 from Phidget22.Devices.Spatial import *
+#venv\Scripts\Activate.ps1
 
 
-### Virgo and radio astronomy varibles
+### Virgo and radio astronomy varibles#
 observing_time = 8 # in seconds
 observation_start_time = 5 # in seconds
 sdr_rf_gain = 20
@@ -44,7 +45,7 @@ final_observing_values = {
     'rf_gain': sdr_rf_gain,
     'if_gain': if_gain,
     'bb_gain': bb_gain,
-    'frequency': test_transmit_freq,
+    'frequency': hydrogen_line_freq,
     'bandwidth': observing_bandwidth,
     'channels': channels,
     't_sample': t_sample,
@@ -91,8 +92,8 @@ attachment_time = 5 * 1000
 
 
 ### Pygame varibles
-screen_width = 1600
-screen_height = 900
+screen_width = 1500
+screen_height = 800
 fps = 30 
 
 white = (255,255,255)
@@ -582,7 +583,7 @@ while running:
                     print("The angle sensor is connected!")
 
 
-            #Button that tries to run the actual obseravtion
+            #Button that tries to run the obseravtion
             if temp_state_3 == True:
                 final_observing_values['loc']
                 final_observing_values['duration'] = observing_time
