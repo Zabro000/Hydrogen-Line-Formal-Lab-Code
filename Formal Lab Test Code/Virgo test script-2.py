@@ -11,7 +11,7 @@ obs = {
     'bandwidth': 2.4e6,
     'channels': 2048,
     't_sample': 1,
-    'duration': 12,
+    'duration': 10,
     'loc': '',
     'ra_dec': '',
     'az_alt': ''

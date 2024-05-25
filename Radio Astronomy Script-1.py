@@ -14,6 +14,7 @@ sdr_rf_gain = 20
 if_gain = 25
 bb_gain = 18
 hydrogen_line_freq = 1.420405751768 * 10**9
+test_transmit_freq = 845 * 10**6
 observing_bandwidth = 2.4 * 10**6
 channels = 2048
 t_sample = 1
@@ -43,7 +44,7 @@ final_observing_values = {
     'rf_gain': sdr_rf_gain,
     'if_gain': if_gain,
     'bb_gain': bb_gain,
-    'frequency': hydrogen_line_freq,
+    'frequency': test_transmit_freq,
     'bandwidth': observing_bandwidth,
     'channels': channels,
     't_sample': t_sample,
