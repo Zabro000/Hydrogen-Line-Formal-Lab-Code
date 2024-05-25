@@ -594,6 +594,7 @@ while running:
 
                 try: 
                     virgo.observe(final_observing_values, 'wola', observation_output_data_file_name,start_in = observation_start_time)
+                    print("Observation is complete!")
                 except ModuleNotFoundError as error:
                     print("Check if the SDR is connected")
                     print(error)
@@ -604,7 +605,7 @@ while running:
 
                 try: 
                     virgo.plot(obs_parameters= default_observing_values, n = 20, m =35, f_rest= hydrogen_line_freq,
-                                vlsr=True, meta=True, avg_ylim=(-5,15), cal_ylim=(-20,260), obs_file= observation_output_data_file_name, 
+                                vlsr=False, meta=False, avg_ylim=(-5,15), cal_ylim=(-20,260), obs_file= observation_output_data_file_name,
                                 rfi=[(1419.2e6, 1419.3e6), (1420.8e6, 1420.9e6)], dB=True, spectra_csv='spectrum.csv', plot_file='plot.png')
                     
                 except Exception as error: 
