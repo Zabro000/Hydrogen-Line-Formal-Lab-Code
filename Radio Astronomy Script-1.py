@@ -8,7 +8,7 @@ from Phidget22.Devices.Spatial import *
 
 
 ### Virgo and radio astronomy varibles
-observing_time = 60 # in seconds
+observing_time = 10 # in seconds
 observation_start_time = 5 # in seconds
 sdr_rf_gain = 20
 if_gain = 25
