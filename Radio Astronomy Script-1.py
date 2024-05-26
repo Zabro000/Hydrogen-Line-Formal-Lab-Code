@@ -56,11 +56,11 @@ final_observing_values = {
 }
 
 ### Varibles and dicts for the astronomical coordinates
-observation_ra = None 
-observation_dec = None 
+observation_ra = 0 
+observation_dec = 0 
 observation_ra_dec = [observation_ra, observation_dec]
-observation_alt = None 
-observation_az = None
+observation_alt = 0 
+observation_az = 0
 observation_az_alt = [observation_az, observation_alt]
 
 default_observation_coordinates = {
@@ -264,6 +264,20 @@ def parse_time() -> str:
 
     return virgo_time_string
 
+#Function to display time on screen
+def display_time() -> str:
+    time_tuple = time.localtime()
+
+    year = time_tuple.tm_year
+    month = time_tuple.tm_mon
+    day = time_tuple.tm_mday
+    hour = time_tuple.tm_hour
+    minute = time_tuple.tm_min
+    second = time_tuple.tm_sec
+
+    return f"{year}-{month}-{day} {hour}:{minute}:{second}"
+
+
 #Handles the end of the game loop, so everthing is updated
 def end_of_game_loop_button_render(general_screen, button_group) -> None:
     button_group.update()
@@ -404,7 +418,7 @@ def draw_txt(surf, text, size, color, x, y):
 
 
 
-### First game loop for the starting screen
+### First game loop for the starting screen ###
 color_button = Button("Night Mode", screen_width/2, screen_height/2,  )
 skip_button = Button("Skip Settings", screen_width/2 - 300, screen_height/2)
 continue_button = Button("Continue", screen_width/2, screen_height/2 + 200)
@@ -425,6 +439,8 @@ location_settings_text_state = False
 location_settings_user_input = " "
 location_settings_parsed_1 = " "
 
+display_clock = None
+display_location = None 
 location_settings_iterate = 0
 
 
@@ -457,10 +473,10 @@ while running:
             
             #These two if statements will make sure that this only runs if the button was turned on because the button needs to be pressed and the state of the button needs to be on
             if location_settings_button.state == True and click_state_2 == True:
-                print("on")
-
                 #Changes a state varbile so the code knows if the user wants to input text
                 location_settings_text_state = True
+                print("on")
+            #Stop inputting text if the button is off now
             else:
                 location_settings_text_state = False 
 
@@ -484,9 +500,18 @@ while running:
                 location_settings_user_input += event.unicode
             
             print(location_settings_user_input)
-            
     
-    screen.fill(main_screen_color)
+    
+    screen.fill(main_screen_color)   
+
+    display_clock = display_time()
+    draw_txt(screen, display_clock, 25, basic_text_color, screen_width/2, 50)
+
+    display_location = f"Latitude: {default_location_parameters['lat']}(deg), Longitude: {default_location_parameters['lon']}(deg), Height: {default_location_parameters['height']}(m)"
+    draw_txt(screen, f"Location:", 20, basic_text_color, screen_width/2 + 400, screen_height/2 -30) 
+    draw_txt(screen, display_location, 20, basic_text_color, screen_width/2 + 400, screen_height/2)  
+    
+    
 
     #Draw the user input for the location settings input only if the button for that is still on
     if location_settings_text_state == True:
@@ -505,7 +530,7 @@ while running:
 ### Second loop for getting the observation ready, the functions for the user input is the same so there are only comments on the new bits
 manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 600, screen_height/2 - 300)
 auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 600, screen_height/2 + 100)
-hi_display_button = Button("Show Hydrogen Map", screen_width/2 - 300, screen_height/2 - 100)
+hi_display_button = Button("Show Hydrogen Map", screen_width/2 - 300, screen_height/2 + 300)
 test_spatial_phidget_button = Button("Test Phidget", screen_width/2 - 600, screen_height/2 - 100)
 run_observation_button = Button("Begin Observation", screen_width/2 + 600, screen_height/2 -100)
 change_observation_time_button = Button("Change Observation Time", screen_width/2 - 600, screen_height/2 + 300)
@@ -528,10 +553,20 @@ running = True
 inital_time = time.time()
 final_time = time.time()
 wait_time = 10
+
 observation_output_data_file_name = None
 manual_alt_az_text_state = False 
 manual_alt_az_user_input = " "
 manual_alt_az_user_input_parsed = " "
+
+display_clock = None
+display_location = None 
+display_coordinates_1 = None
+display_coordinates_2 = None
+display_round = 2
+
+width_constant = -260
+display_value_x_location = screen_width/2 + width_constant
 
 
 
@@ -632,6 +667,27 @@ while running:
 
 
     screen.fill(main_screen_color)
+
+    display_clock = display_time()
+    draw_txt(screen, display_clock, 25, basic_text_color, screen_width/2, 50)
+
+    display_location = f"Latitude: {default_location_parameters['lat']}(deg), Longitude: {default_location_parameters['lon']}(deg), Height: {default_location_parameters['height']}(m)"
+    draw_txt(screen, f"Location:", 20, basic_text_color, display_value_x_location, screen_height/2 - 300) 
+    draw_txt(screen, display_location, 20, basic_text_color, display_value_x_location, screen_height/2 - 270) 
+
+    #default_observation_coordinates['']
+    display_coordinates_1 = f"Azimuth: {default_observation_coordinates['azimuth']}(deg) Altitude: {default_observation_coordinates['altitude']}(deg)"
+    display_coordinates_2 = f"Right Ascension: {round(default_observation_coordinates['right ascension'],display_round)}(hr), Declination: {round(default_observation_coordinates['declination'], display_round)}(deg)"
+    draw_txt(screen, f"Coordinates:", 20, basic_text_color, display_value_x_location, screen_height/2 - 210)
+    draw_txt(screen, display_coordinates_1, 20, basic_text_color, display_value_x_location, screen_height/2 - 180)
+    draw_txt(screen, display_coordinates_2, 20, basic_text_color, display_value_x_location, screen_height/2 - 150)
+
+    draw_txt(screen, f"Observation Time: {final_observing_values['duration']}(s)", 20, basic_text_color, display_value_x_location, screen_height/2 - 90)
+    draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color, display_value_x_location, screen_height/2 - 60)
+ 
+
+
+
 
     if manual_alt_az_text_state == True:
         draw_txt(screen, f"like: az,alt {manual_alt_az_user_input}", 19, basic_text_color, manual_alt_az_button.x_position, manual_alt_az_button.y_position + 50)
