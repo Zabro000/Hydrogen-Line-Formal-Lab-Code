@@ -10,7 +10,7 @@ from Phidget22.Devices.Spatial import *
 
 ### Virgo and radio astronomy varibles#
 observing_time = 8 # in seconds
-observation_start_time = 5 # in seconds
+observation_start_time = 1 # in seconds
 sdr_rf_gain = 20
 if_gain = 25
 bb_gain = 18
@@ -250,9 +250,9 @@ def output_file_name_assigner_function(sdr_gain = None, coordinates_dict = None,
     ra = round(coordinates_dict['right ascension'], round_num)
     dec = round(coordinates_dict['declination'], round_num)
 
-    raw_data_file_name = f"HL Data;{year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration;{observation_time}(s), Gain;{sdr_gain}(dB), ra and dec;{ra}(hr), {dec}(deg).dat"
-    plot_image_file_name = f"HL Plot;{year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration;{observation_time}(s), Gain;{sdr_gain}(dB), ra and dec;{ra}(hr), {dec}(deg).png"
-    spectra_csv_file_name = f"HL CSV;{year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration;{observation_time}(s), Gain;{sdr_gain}(dB), ra and dec;{ra}(hr), {dec}(deg).csv"
+    raw_data_file_name = f"HL Data; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {observation_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).dat"
+    plot_image_file_name = f"HL Plot; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {observation_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).png"
+    spectra_csv_file_name = f"HL CSV; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {observation_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).csv"
 
 
     return raw_data_file_name, plot_image_file_name, spectra_csv_file_name
@@ -678,22 +678,26 @@ while running:
 
     screen.fill(main_screen_color)
 
+
     display_clock = display_time()
     draw_txt(screen, display_clock, 25, basic_text_color, screen_width/2, 50)
 
-    display_location = f"Latitude: {default_location_parameters['lat']}(deg), Longitude: {default_location_parameters['lon']}(deg), Height: {default_location_parameters['height']}(m)"
+    display_location_1 = f"Latitude: {default_location_parameters['lat']}(deg), Longitude: {default_location_parameters['lon']}(deg)"
+    display_location_2 = f"Height: {default_location_parameters['height']}(m)"
+    
     draw_txt(screen, f"Location:", 20, basic_text_color, display_value_x_location, screen_height/2 - 300) 
-    draw_txt(screen, display_location, 20, basic_text_color, display_value_x_location, screen_height/2 - 270) 
+    draw_txt(screen, display_location_1, 20, basic_text_color, display_value_x_location, screen_height/2 - 270) 
+    draw_txt(screen, display_location_2, 20, basic_text_color, display_value_x_location, screen_height/2 - 240) 
 
     #default_observation_coordinates['']
-    display_coordinates_1 = f"Azimuth: {default_observation_coordinates['azimuth']}(deg) Altitude: {default_observation_coordinates['altitude']}(deg)"
+    display_coordinates_1 = f"Azimuth: {default_observation_coordinates['azimuth']}(deg), Altitude: {default_observation_coordinates['altitude']}(deg)"
     display_coordinates_2 = f"Right Ascension: {round(default_observation_coordinates['right ascension'],display_round)}(hr), Declination: {round(default_observation_coordinates['declination'], display_round)}(deg)"
-    draw_txt(screen, f"Coordinates:", 20, basic_text_color, display_value_x_location, screen_height/2 - 210)
-    draw_txt(screen, display_coordinates_1, 20, basic_text_color, display_value_x_location, screen_height/2 - 180)
-    draw_txt(screen, display_coordinates_2, 20, basic_text_color, display_value_x_location, screen_height/2 - 150)
+    draw_txt(screen, f"Coordinates:", 20, basic_text_color, display_value_x_location, screen_height/2 - 180)
+    draw_txt(screen, display_coordinates_1, 20, basic_text_color, display_value_x_location, screen_height/2 - 150)
+    draw_txt(screen, display_coordinates_2, 20, basic_text_color, display_value_x_location, screen_height/2 - 120)
 
-    draw_txt(screen, f"Observation Time: {final_observing_values['duration']}(s)", 20, basic_text_color, display_value_x_location, screen_height/2 - 90)
-    draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color, display_value_x_location, screen_height/2 - 60)
+    draw_txt(screen, f"Observation Time: {final_observing_values['duration']}(s)", 20, basic_text_color, display_value_x_location, screen_height/2 - 60)
+    draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color, display_value_x_location, screen_height/2 - 30)
  
 
     if manual_alt_az_text_state == True:
