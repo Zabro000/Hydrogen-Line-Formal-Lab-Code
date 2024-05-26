@@ -220,8 +220,8 @@ class Button(pygame.sprite.Sprite):
 def screen_color_change(object) -> None:
     ...
 
-#Function that outputs a unique name to the data collected based on the date and other parameters
-def output_data_file_name(sdr_gain = None, coordinates_dict = None, observation_time = None) -> str:
+#Function that creates the name of the data, png and csv spectra output files 
+def output_file_name_assigner_function(sdr_gain = None, coordinates_dict = None, observation_time = None) -> str:
 
     if sdr_gain == None: 
         #Refers to thr rf gain for the sdr outside of this function 
@@ -248,9 +248,13 @@ def output_data_file_name(sdr_gain = None, coordinates_dict = None, observation_
     ra = coordinates_dict['right ascension']
     dec = coordinates_dict['declination']
 
-    file_name = f"HL Data;{year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration;{observation_time}(s), Gain;{sdr_gain}(dB), ra and dec;{ra}(hr), {dec}(deg).dat"
+    raw_data_file_name = f"HL Data;{year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration;{observation_time}(s), Gain;{sdr_gain}(dB), ra and dec;{ra}(hr), {dec}(deg).dat"
+    plot_image_file_name = f"HL Plot;{year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration;{observation_time}(s), Gain;{sdr_gain}(dB), ra and dec;{ra}(hr), {dec}(deg).png"
+    spectra_csv_file_name = f"HL CSV;{year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration;{observation_time}(s), Gain;{sdr_gain}(dB), ra and dec;{ra}(hr), {dec}(deg).csv"
 
-    return file_name
+
+    return raw_data_file_name, plot_image_file_name, spectra_csv_file_name
+
 
 #Function that gets the time right now and returns it in a year, month, day format
 def parse_time() -> str:
@@ -526,7 +530,6 @@ while running:
 
 
 
-
 ### Second loop for getting the observation ready, the functions for the user input is the same so there are only comments on the new bits
 manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 600, screen_height/2 - 300)
 auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 600, screen_height/2 + 100)
@@ -554,7 +557,12 @@ inital_time = time.time()
 final_time = time.time()
 wait_time = 10
 
+#These all are created at the same time when the observation is ran but may or may not be used
+#I might want to combine all these functions into one just for ease of coding
 observation_output_data_file_name = None
+observation_image_plot_name = None
+observation_csv_file_name = None
+
 manual_alt_az_text_state = False 
 manual_alt_az_user_input = " "
 manual_alt_az_user_input_parsed = " "
@@ -625,7 +633,8 @@ while running:
                 final_observing_values['rf_gain'] = sdr_rf_gain
                 final_observing_values['ra_dec'] = observation_ra_dec
                 final_observing_values['az_alt'] = observation_az_alt
-                observation_output_data_file_name = output_data_file_name()
+
+                observation_output_data_file_name, observation_image_plot_name, observation_csv_file_name = output_file_name_assigner_function()
                 print(observation_output_data_file_name)
 
                 try: 
@@ -641,12 +650,11 @@ while running:
 
                 try: 
                     virgo.plot(obs_parameters= default_observing_values, n = 20, m =35, f_rest= hydrogen_line_freq,
-                                vlsr=False, meta=False, avg_ylim=(-5,15), cal_ylim=(-20,260), obs_file= observation_output_data_file_name,
-                                rfi=[(1419.2e6, 1419.3e6), (1420.8e6, 1420.9e6)], dB=True, spectra_csv='spectrum.csv', plot_file='plot.png')
+                                vlsr=True, meta=False, avg_ylim=(-5,15), cal_ylim=(-20,260), obs_file= observation_output_data_file_name,
+                                rfi=[(1419.2e6, 1419.3e6), (1420.8e6, 1420.9e6)], dB=False, spectra_csv=observation_csv_file_name, plot_file=observation_image_plot_name)
                     
                 except Exception as error: 
-                    print("The SDR may not be connnected or no observation has been done while this was open")
-                    print(error)
+                    print("Propably no observation has been done while this was open", error)
                 
     
         if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
@@ -685,9 +693,6 @@ while running:
     draw_txt(screen, f"Observation Time: {final_observing_values['duration']}(s)", 20, basic_text_color, display_value_x_location, screen_height/2 - 90)
     draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color, display_value_x_location, screen_height/2 - 60)
  
-
-
-
 
     if manual_alt_az_text_state == True:
         draw_txt(screen, f"like: az,alt {manual_alt_az_user_input}", 19, basic_text_color, manual_alt_az_button.x_position, manual_alt_az_button.y_position + 50)
