@@ -245,8 +245,10 @@ def output_file_name_assigner_function(sdr_gain = None, coordinates_dict = None,
     hour = time_tuple.tm_hour
     minute = time_tuple.tm_min
 
-    ra = coordinates_dict['right ascension']
-    dec = coordinates_dict['declination']
+    round_num = 2
+
+    ra = round(coordinates_dict['right ascension'], round_num)
+    dec = round(coordinates_dict['declination'], round_num)
 
     raw_data_file_name = f"HL Data;{year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration;{observation_time}(s), Gain;{sdr_gain}(dB), ra and dec;{ra}(hr), {dec}(deg).dat"
     plot_image_file_name = f"HL Plot;{year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration;{observation_time}(s), Gain;{sdr_gain}(dB), ra and dec;{ra}(hr), {dec}(deg).png"
