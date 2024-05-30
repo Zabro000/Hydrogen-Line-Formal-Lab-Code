@@ -281,6 +281,15 @@ def display_time() -> str:
     minute = time_tuple.tm_min
     second = time_tuple.tm_sec
 
+    if float(hour) < 10:
+        hour = str(f"0{hour}")
+
+    if float(minute) < 10:
+        minute = str(f"0{minute}")
+
+    if float(second) < 10:
+        second = str(f"0{second}")
+
     return f"{year}-{month}-{day} {hour}:{minute}:{second}"
 
 
@@ -425,16 +434,14 @@ def draw_txt(surf, text, size, color, x, y):
 
 
 ### First game loop for the starting screen ###
-color_button = Button("Night Mode", screen_width/2, screen_height/2,  )
-skip_button = Button("Skip Settings", screen_width/2 - 300, screen_height/2)
-continue_button = Button("Continue", screen_width/2, screen_height/2 + 200)
-location_settings_button = Button("Change Location", screen_width/2 -300, screen_height/2 + 200)
+#color_button = Button("Night Mode", screen_width/2, screen_height/2)
+continue_button = Button("Continue", screen_width/2, screen_height/2)
+location_settings_button = Button("Change Location", screen_width/2 -300, screen_height/2)
 
 
 
 screen_1_buttons = pygame.sprite.Group()
-screen_1_buttons.add(color_button)
-screen_1_buttons.add(skip_button)
+#screen_1_buttons.add(color_button)
 screen_1_buttons.add(continue_button)
 screen_1_buttons.add(location_settings_button)
  
@@ -468,8 +475,7 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             
             #If the mouse was clicked, this runs through to see if the mouse was over a button 
-            Button.on_or_off_button_click(color_button, pygame.mouse.get_pos())
-            Button.on_or_off_button_click(skip_button, pygame.mouse.get_pos())
+            #Button.on_or_off_button_click(color_button, pygame.mouse.get_pos())
             Button.on_or_off_button_click(continue_button, pygame.mouse.get_pos())
             click_state_2 = Button.on_or_off_button_click(location_settings_button, pygame.mouse.get_pos())
 
@@ -535,7 +541,7 @@ while running:
 ### Second loop for getting the observation ready, the functions for the user input is the same so there are only comments on the new bits
 manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 600, screen_height/2 - 300)
 auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 600, screen_height/2 + 100)
-hi_display_button = Button("Show Hydrogen Map", screen_width/2 - 300, screen_height/2 + 300)
+hi_display_button = Button("Show Hydrogen Map", screen_width/2 - 600, screen_height/2 + 300)
 test_spatial_phidget_button = Button("Test Phidget", screen_width/2 - 600, screen_height/2 - 100)
 run_observation_button = Button("Begin Observation", screen_width/2 + 600, screen_height/2 -100)
 change_observation_time_button = Button("Change Observation Time", screen_width/2 - 600, screen_height/2 + 300)
@@ -549,8 +555,8 @@ screen_2_buttons.add(auto_alt_az_button)
 screen_2_buttons.add(hi_display_button)
 screen_2_buttons.add(test_spatial_phidget_button)
 screen_2_buttons.add(run_observation_button)
-screen_2_buttons.add(change_observation_time_button)
-screen_2_buttons.add(select_file_to_plot_button)
+#screen_2_buttons.add(change_observation_time_button)
+#screen_2_buttons.add(select_file_to_plot_button)
 screen_2_buttons.add(plot_just_finished_observation_button)
 
 
@@ -598,7 +604,7 @@ while running:
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             click_state_1 =Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
-            click_state_2 =Button.on_or_off_button_click(auto_alt_az_button, pygame.mouse.get_pos())
+            temp_state_5 =Button.doer_button_click(auto_alt_az_button, pygame.mouse.get_pos())
             temp_state_1 = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
             temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
             temp_state_3 = Button.doer_button_click(run_observation_button, pygame.mouse.get_pos())
@@ -657,6 +663,11 @@ while running:
                     
                 except Exception as error: 
                     print("Propably no observation has been done while this was open", error)
+
+            if temp_state_5 == True: 
+                print("There is no code here yet.")
+                
+
                 
     
         if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
@@ -692,11 +703,12 @@ while running:
     #default_observation_coordinates['']
     display_coordinates_1 = f"Azimuth: {default_observation_coordinates['azimuth']}(deg), Altitude: {default_observation_coordinates['altitude']}(deg)"
     display_coordinates_2 = f"Right Ascension: {round(default_observation_coordinates['right ascension'],display_round)}(hr), Declination: {round(default_observation_coordinates['declination'], display_round)}(deg)"
+    
     draw_txt(screen, f"Coordinates:", 20, basic_text_color, display_value_x_location, screen_height/2 - 180)
     draw_txt(screen, display_coordinates_1, 20, basic_text_color, display_value_x_location, screen_height/2 - 150)
     draw_txt(screen, display_coordinates_2, 20, basic_text_color, display_value_x_location, screen_height/2 - 120)
 
-    draw_txt(screen, f"Observation Time: {final_observing_values['duration']}(s)", 20, basic_text_color, display_value_x_location, screen_height/2 - 60)
+    draw_txt(screen, f"Observation Time: {final_observing_values['duration'] - 4}(s)", 20, basic_text_color, display_value_x_location, screen_height/2 - 60)
     draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color, display_value_x_location, screen_height/2 - 30)
  
 
