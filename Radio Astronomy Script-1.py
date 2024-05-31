@@ -422,6 +422,52 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
     print("Done updating observtion coordinates! ", default_observation_coordinates)
 
 
+#This function parses and chnages the observation time 
+def user_change_and_parse_observation_time(user_time_input) -> None:
+   
+    global final_observing_values
+    global observation_time_offset
+
+    error_value = 10
+
+    try:
+        user_time_input = float(user_time_input)
+
+    except ValueError as error:
+        print("Bad inputted value. ", error)
+        final_observing_values['duration'] = error_value
+        return None 
+    
+    final_observing_values['duration'] = user_time_input + observation_time_offset
+    print("Done updating the observation time!", final_observing_values['duration'])
+
+
+def user_update_ra_and_dec_list_parse(inputted_list) -> str:
+    error_list = [0,0]
+
+    try:
+        stripped_input = inputted_list.strip()
+        splited_list = stripped_input.split(",")
+    except:
+        print("Bad list values.")
+        return error_list
+    
+    if len(splited_list) != 2:
+        print("Wrong number of inputs.")
+        return error_list
+    else: 
+        return splited_list
+    
+
+def user_update_ra_and_dec(inputted_list) -> None:
+    global default_observation_coordinates
+    global default_location_parameters
+
+
+    
+
+    
+
 #Mr.V's on screen text drawing function. It is really helpful!
 def draw_txt(surf, text, size, color, x, y):
     font = pygame.font.Font(font_name, size)
@@ -539,12 +585,13 @@ while running:
 
 
 ### Second loop for getting the observation ready, the functions for the user input is the same so there are only comments on the new bits
-manual_alt_az_button = Button("Manual Alt Az", screen_width/2 - 600, screen_height/2 - 300)
+manual_alt_az_button = Button("Manual Alt/Az", screen_width/2 - 600, screen_height/2 - 300)
 auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 600, screen_height/2 + 100)
 hi_display_button = Button("Show Hydrogen Map", screen_width/2 - 600, screen_height/2 + 300)
 test_spatial_phidget_button = Button("Test Phidget", screen_width/2 - 600, screen_height/2 - 100)
 run_observation_button = Button("Begin Observation", screen_width/2 + 600, screen_height/2 -100)
-change_observation_time_button = Button("Change Observation Time", screen_width/2 - 600, screen_height/2 + 300)
+manual_ra_dec_button = Button("Manual Ra/Dec", screen_width/2 - 300, screen_height/2 + 100)
+change_observation_time_button = Button("Change Observation Time", screen_width/2 - 300, screen_height/2 + 300)
 select_file_to_plot_button = Button("Plot Selected File", screen_width/2 + 600, screen_height/2 + 300)
 plot_just_finished_observation_button = Button("Plot Data", screen_width/2 + 600, screen_height/2 + 100)
 
@@ -555,9 +602,10 @@ screen_2_buttons.add(auto_alt_az_button)
 screen_2_buttons.add(hi_display_button)
 screen_2_buttons.add(test_spatial_phidget_button)
 screen_2_buttons.add(run_observation_button)
-#screen_2_buttons.add(change_observation_time_button)
+screen_2_buttons.add(change_observation_time_button)
 #screen_2_buttons.add(select_file_to_plot_button)
 screen_2_buttons.add(plot_just_finished_observation_button)
+screen_2_buttons.add(manual_ra_dec_button)
 
 
 running = True 
@@ -574,6 +622,14 @@ observation_csv_file_name = None
 manual_alt_az_text_state = False 
 manual_alt_az_user_input = " "
 manual_alt_az_user_input_parsed = " "
+
+observation_time_text_state = False 
+observation_time_input = " "
+observation_time_input_parsed = " "
+
+manual_ra_dec_text_state = False 
+manual_ra_dec_user_input = " "
+manual_ra_dec_user_input_parsed = " "
 
 display_clock = None
 display_location = None 
@@ -609,6 +665,8 @@ while running:
             temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
             temp_state_3 = Button.doer_button_click(run_observation_button, pygame.mouse.get_pos())
             temp_state_4 = Button.doer_button_click(plot_just_finished_observation_button, pygame.mouse.get_pos())
+            click_state_2 = Button.on_or_off_button_click(change_observation_time_button, pygame.mouse.get_pos())
+            click_state_3 = Button.on_or_off_button_click(manual_ra_dec_button, pygame.mouse.get_pos())
 
 
             #This handles the manual alt and az input from the user
@@ -616,6 +674,18 @@ while running:
                 manual_alt_az_text_state = True
             else:
                 manual_alt_az_text_state = False
+
+            if change_observation_time_button.state == True and click_state_2 == True:
+                observation_time_text_state = True
+            else: 
+                observation_time_text_state = False
+
+            if manual_ra_dec_button.state == True and click_state_3 == True:
+                manual_ra_dec_text_state = True
+            else: 
+                manual_ra_dec_text_state = False
+
+
 
             
             #Displays a map of the hydrogen line strength and a dot to show where the antenna is pointed at
@@ -669,7 +739,6 @@ while running:
                 
 
                 
-    
         if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
 
             if event.key == pygame.K_RETURN:
@@ -685,6 +754,37 @@ while running:
                 manual_alt_az_user_input += event.unicode
             
             print(manual_alt_az_user_input)
+
+
+        elif event.type == pygame.KEYDOWN and observation_time_text_state == True:
+
+            if event.key == pygame.K_RETURN:
+                print("Varibles set!")
+                user_change_and_parse_observation_time(observation_time_input)
+
+            elif event.key == pygame.K_BACKSPACE:
+                observation_time_input =  observation_time_input[:-1]
+
+            else:
+                observation_time_input += event.unicode
+            
+            print(observation_time_input)
+
+        """  elif event.type == pygame.KEYDOWN and manual_ra_dec_text_state == True:
+
+            if event.key == pygame.K_RETURN:
+                print("Varibles set!")
+                user_change_and_parse_observation_time(observation_time_input)
+
+            elif event.key == pygame.K_BACKSPACE:
+                observation_time_input =  observation_time_input[:-1]
+
+            else:
+                observation_time_input += event.unicode
+            
+            print(observation_time_input) """
+
+
 
 
     screen.fill(main_screen_color)
@@ -708,13 +808,18 @@ while running:
     draw_txt(screen, display_coordinates_1, 20, basic_text_color, display_value_x_location, screen_height/2 - 150)
     draw_txt(screen, display_coordinates_2, 20, basic_text_color, display_value_x_location, screen_height/2 - 120)
 
-    draw_txt(screen, f"Observation Time: {final_observing_values['duration'] - 4}(s)", 20, basic_text_color, display_value_x_location, screen_height/2 - 60)
+    draw_txt(screen, f"Observation Time: {final_observing_values['duration'] - observation_time_offset}(s)", 20, basic_text_color, display_value_x_location, screen_height/2 - 60)
     draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color, display_value_x_location, screen_height/2 - 30)
  
 
-    if manual_alt_az_text_state == True:
+    if manual_alt_az_button.state == True:
         draw_txt(screen, f"like: az,alt {manual_alt_az_user_input}", 19, basic_text_color, manual_alt_az_button.x_position, manual_alt_az_button.y_position + 50)
 
+    if change_observation_time_button.state == True:
+        draw_txt(screen, f"like: time {observation_time_input}", 19, basic_text_color, change_observation_time_button.x_position, change_observation_time_button.y_position + 50)
+
+    
+    
     end_of_game_loop_button_render(screen, screen_2_buttons)
 
     pygame.display.flip()
