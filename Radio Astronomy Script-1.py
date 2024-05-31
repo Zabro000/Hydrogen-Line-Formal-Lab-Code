@@ -405,19 +405,34 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
         print("Bad values: ", default_observation_coordinates)
         return None
     
+
+
+   #Function that gets the ra and dec 
+    try:
+        ra_dec_list = virgo.equatorial(default_observation_coordinates['altitude'], default_observation_coordinates['azimuth'], 
+                     default_location_parameters['lat'], default_location_parameters['lon'], default_location_parameters['height'])
+        
+    except ValueError as error:
+        default_observation_coordinates['azimuth'] = error_value
+        default_observation_coordinates['altitude'] = error_value
+        default_observation_coordinates['azimuth and altitude list'] = error_list
+        default_observation_coordinates['right ascension'] = error_value
+        default_observation_coordinates['declination'] = error_value
+        default_observation_coordinates['right ascension and declination list'] = error_list
+
+        print("Conversion to right ascension and declination failed. ", error)
+        return None
+
+
     az_alt_list = [default_observation_coordinates['azimuth'], default_observation_coordinates['altitude']]
    
     default_observation_coordinates['azimuth and altitude list'] = az_alt_list
-
-   #Function that gets the ra and dec 
-    ra_dec_list = virgo.equatorial(default_observation_coordinates['altitude'], default_observation_coordinates['azimuth'], 
-                     default_location_parameters['lat'], default_location_parameters['lon'], default_location_parameters['height'])
-    
    
     default_observation_coordinates['right ascension'] = ra_dec_list[0]
     default_observation_coordinates['declination'] = ra_dec_list[1]
 
     ra_dec_list = [default_observation_coordinates['right ascension'], default_observation_coordinates['declination']]
+
     default_observation_coordinates['right ascension and declination list'] = ra_dec_list
 
     print("Done updating observtion coordinates! ", default_observation_coordinates)
@@ -464,6 +479,8 @@ def user_update_ra_and_dec(inputted_list) -> None:
     global default_observation_coordinates
     global default_location_parameters
 
+
+    #Extra function just so I dont need to copy all the error value assign lines for each wrong case
     def error_value_assign() -> None:
         global default_observation_coordinates
         global default_location_parameters
@@ -634,7 +651,7 @@ while running:
     
 
     #Draw the user input for the location settings input only if the button for that is still on
-    if location_settings_text_state == True:
+    if location_settings_button.state == True:
         draw_txt(screen, f"like: lat,lon,elv {location_settings_user_input}", 19, basic_text_color, location_settings_button.x_position, location_settings_button.y_position + 50)
 
     end_of_game_loop_button_render(screen, screen_1_buttons)
