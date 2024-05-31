@@ -813,6 +813,7 @@ while running:
                 
 
                 
+        #Text input for the alt and az and conversion to ra and dec, I need to add galatic cordinates
         if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
 
             if event.key == pygame.K_RETURN:
@@ -830,6 +831,7 @@ while running:
             print(manual_alt_az_user_input)
 
 
+        #Text input for observation time
         elif event.type == pygame.KEYDOWN and observation_time_text_state == True:
 
             if event.key == pygame.K_RETURN:
@@ -844,6 +846,7 @@ while running:
             
             print(observation_time_input)
 
+        #Input to manually change the ra and dec, it does not back calculate the alt and az though
         elif event.type == pygame.KEYDOWN and manual_ra_dec_text_state == True:
 
             if event.key == pygame.K_RETURN:
