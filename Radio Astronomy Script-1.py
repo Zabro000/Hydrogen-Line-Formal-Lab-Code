@@ -132,6 +132,7 @@ class Button(pygame.sprite.Sprite):
     def __init__(self, button_text, position_x, position_y, colors = None, state = None) -> None:
         self.button_width = 200
         self.button_height = 100
+
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((self.button_width, self.button_height))
         self.rect = self.image.get_rect()
