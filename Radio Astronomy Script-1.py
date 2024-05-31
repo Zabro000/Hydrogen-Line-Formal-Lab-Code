@@ -10,8 +10,9 @@ from Phidget22.Devices.Spatial import *
 
 ### Virgo and radio astronomy varibles#
 observation_time_offset = 4
-observing_time = 60 # in seconds
-observation_start_time = 1 # in seconds
+
+observing_time = 60 + observation_time_offset# in seconds
+observation_start_time = 4 # in seconds
 sdr_rf_gain = 20
 if_gain = 25
 bb_gain = 18
@@ -354,6 +355,23 @@ def user_change_location_parse(location_list) -> None:
         return None 
 
 
+#This is used in the manual ra/dec and the manual az/alt parse functions!
+def error_value_coordinates_assign() -> None:
+        global default_observation_coordinates
+        global default_location_parameters
+
+        
+        error_value = 0
+        error_list = [0,0]
+
+        default_observation_coordinates['right ascension'] = error_value
+        default_observation_coordinates['declination'] = error_value
+        default_observation_coordinates['right ascension and declination list'] = error_list
+        default_observation_coordinates['altitude'] = error_value
+        default_observation_coordinates['azimuth'] = error_value
+        default_observation_coordinates['azimuth and altitude list'] = error_list
+
+
 
 #Function that parses the user input of what alt and az the antenna is pointed at
 def user_change_az_alt_list_parse(raw_input, split_char = None) -> list:
@@ -384,26 +402,18 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
     ra_dec_list = []
 
     if len(az_alt_input_list) != 2:
-        default_observation_coordinates['azimuth'] = error_value
-        default_observation_coordinates['altitude'] = error_value
-        default_observation_coordinates['azimuth and altitude list'] = error_list
-        default_observation_coordinates['right ascension'] = error_value
-        default_observation_coordinates['declination'] = error_value
-        default_observation_coordinates['right ascension and declination list'] = error_list
-        print("Not enough values: ", default_observation_coordinates)
+        error_value_coordinates_assign()
+
+        print("Wrong number of values inputted: ", default_observation_coordinates)
         return None 
     
     try: 
         default_observation_coordinates['azimuth'] = float(az_alt_input_list[0])
         default_observation_coordinates['altitude'] = float(az_alt_input_list[1])
     except:
-        default_observation_coordinates['azimuth'] = error_value
-        default_observation_coordinates['altitude'] = error_value
-        default_observation_coordinates['azimuth and altitude list'] = error_list
-        default_observation_coordinates['right ascension'] = error_value
-        default_observation_coordinates['declination'] = error_value
-        default_observation_coordinates['right ascension and declination list'] = error_list
-        print("Bad values: ", default_observation_coordinates)
+        error_value_coordinates_assign()
+
+        print("Bad values inputted: ", default_observation_coordinates)
         return None
     
 
@@ -413,12 +423,7 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
                      default_location_parameters['lat'], default_location_parameters['lon'], default_location_parameters['height'])
         
     except ValueError as error:
-        default_observation_coordinates['azimuth'] = error_value
-        default_observation_coordinates['altitude'] = error_value
-        default_observation_coordinates['azimuth and altitude list'] = error_list
-        default_observation_coordinates['right ascension'] = error_value
-        default_observation_coordinates['declination'] = error_value
-        default_observation_coordinates['right ascension and declination list'] = error_list
+        error_value_coordinates_assign()
 
         print("Conversion to right ascension and declination failed. ", error)
         return None
@@ -438,7 +443,6 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
 
 #This function parses and chnages the observation time 
 def user_change_and_parse_observation_time(user_time_input) -> None:
-   
     global final_observing_values
     global observation_time_offset
 
@@ -453,7 +457,8 @@ def user_change_and_parse_observation_time(user_time_input) -> None:
         return None 
     
     final_observing_values['duration'] = user_time_input + observation_time_offset
-    print("Done updating the observation time!", final_observing_values['duration'])
+
+    print("Done updating the observation time!", final_observing_values['duration'] - observation_time_offset)
 
 
 def user_update_ra_and_dec_list_parse(inputted_list) -> str:
@@ -477,31 +482,16 @@ def user_update_ra_and_dec(inputted_list) -> None:
     global default_observation_coordinates
     global default_location_parameters
 
-
-    #Extra function just so I dont need to copy all the error value assign lines for each wrong case
-    def error_value_assign() -> None:
-        global default_observation_coordinates
-        global default_location_parameters
-
-        
-        error_value = 0
-        error_list = [0,0]
-
-        default_observation_coordinates['right ascension'] = error_value
-        default_observation_coordinates['declination'] = error_value
-        default_observation_coordinates['right ascension and declination list'] = error_list
-        default_observation_coordinates['altitude'] = error_value
-        default_observation_coordinates['azimuth'] = error_value
-        default_observation_coordinates['azimuth and altitude list'] = error_list
-
     
+    #Extra function just so I dont need to copy all the error value assign lines for each wrong case
+
     error_value = 0
     error_list = [0,0]
     total_right_ascension = 24
     total_declination = 90
 
     if len(inputted_list) != 2: 
-        error_value_assign()
+        error_value_coordinates_assign()
         print("Wrong number of values inputted.")
         return None 
 
@@ -511,22 +501,21 @@ def user_update_ra_and_dec(inputted_list) -> None:
         coord_list = [right_ascension, declination]
 
     except ValueError as error:
-        error_value_assign()
+        error_value_coordinates_assign()
         print("Bad values were inputted. ", error)
 
         return None
-    
 
    #Domain of right ascension 
     if right_ascension < 0 or right_ascension > 24:
-        error_value_assign()
+        error_value_coordinates_assign()
         print("Inputted right ascension value is not between 0h and 24hr.")
 
         return None 
     
-    #Domain of decliation check
+    #Domain of decliation 
     elif declination < -90 or declination > 90:
-        error_value_assign()
+        error_value_coordinates_assign()
         print("Inputted declination is not within -90deg and 90 deg.")
 
         return None
@@ -542,8 +531,7 @@ def user_update_ra_and_dec(inputted_list) -> None:
 
     print("Done updating the right ascension and declination. Note the altitude and azimuth does not line up now.")
     
-
-    
+  
 
 #Mr.V's on screen text drawing function. It is really helpful!
 def draw_txt(surf, text, size, color, x, y):
@@ -552,7 +540,6 @@ def draw_txt(surf, text, size, color, x, y):
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
-
 
 
 
