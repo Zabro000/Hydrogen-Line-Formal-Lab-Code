@@ -9,7 +9,8 @@ from Phidget22.Devices.Spatial import *
 
 
 ### Virgo and radio astronomy varibles#
-observing_time = 64 # in seconds
+observation_time_offset = 4
+observing_time = 60 # in seconds
 observation_start_time = 1 # in seconds
 sdr_rf_gain = 20
 if_gain = 25
@@ -458,12 +459,73 @@ def user_update_ra_and_dec_list_parse(inputted_list) -> str:
     else: 
         return splited_list
     
-
+#ra then dec in list
 def user_update_ra_and_dec(inputted_list) -> None:
     global default_observation_coordinates
     global default_location_parameters
 
+    def error_value_assign() -> None:
+        global default_observation_coordinates
+        global default_location_parameters
 
+        
+        error_value = 0
+        error_list = [0,0]
+
+        default_observation_coordinates['right ascension'] = error_value
+        default_observation_coordinates['declination'] = error_value
+        default_observation_coordinates['right ascension and declination list'] = error_list
+        default_observation_coordinates['altitude'] = error_value
+        default_observation_coordinates['azimuth'] = error_value
+        default_observation_coordinates['azimuth and altitude list'] = error_list
+
+    
+    error_value = 0
+    error_list = [0,0]
+    total_right_ascension = 24
+    total_declination = 90
+
+    if len(inputted_list) != 2: 
+        error_value_assign()
+        print("Wrong number of values inputted.")
+        return None 
+
+    try:
+        right_ascension = float(inputted_list[0])
+        declination =  float(inputted_list[1])
+        coord_list = [right_ascension, declination]
+
+    except ValueError as error:
+        error_value_assign()
+        print("Bad values were inputted. ", error)
+
+        return None
+    
+
+   #Domain of right ascension 
+    if right_ascension < 0 or right_ascension > 24:
+        error_value_assign()
+        print("Inputted right ascension value is not between 0h and 24hr.")
+
+        return None 
+    
+    #Domain of decliation check
+    elif declination < -90 or declination > 90:
+        error_value_assign()
+        print("Inputted declination is not within -90deg and 90 deg.")
+
+        return None
+    
+
+    default_observation_coordinates['right ascension'] = right_ascension
+    default_observation_coordinates['declination'] = declination
+    default_observation_coordinates['right ascension and declination list'] = coord_list
+
+    default_observation_coordinates['altitude'] = error_value
+    default_observation_coordinates['azimuth'] = error_value
+    default_observation_coordinates['azimuth and altitude list'] = error_list
+
+    print("Done updating the right ascension and declination. Note the altitude and azimuth does not line up now.")
     
 
     
@@ -686,8 +748,6 @@ while running:
                 manual_ra_dec_text_state = False
 
 
-
-            
             #Displays a map of the hydrogen line strength and a dot to show where the antenna is pointed at
             if temp_state_1 == True: 
                 virgo.map_hi(default_observation_coordinates['right ascension'], default_observation_coordinates['declination'])
@@ -770,19 +830,21 @@ while running:
             
             print(observation_time_input)
 
-        """  elif event.type == pygame.KEYDOWN and manual_ra_dec_text_state == True:
+        elif event.type == pygame.KEYDOWN and manual_ra_dec_text_state == True:
 
             if event.key == pygame.K_RETURN:
                 print("Varibles set!")
-                user_change_and_parse_observation_time(observation_time_input)
+                manual_ra_dec_user_input_parsed = user_update_ra_and_dec_list_parse(manual_ra_dec_user_input)
+                user_update_ra_and_dec(manual_ra_dec_user_input_parsed)
+
 
             elif event.key == pygame.K_BACKSPACE:
-                observation_time_input =  observation_time_input[:-1]
+                manual_ra_dec_user_input =  manual_ra_dec_user_input[:-1]
 
             else:
-                observation_time_input += event.unicode
+                manual_ra_dec_user_input += event.unicode
             
-            print(observation_time_input) """
+            print(manual_ra_dec_user_input)
 
 
 
@@ -817,6 +879,9 @@ while running:
 
     if change_observation_time_button.state == True:
         draw_txt(screen, f"like: time {observation_time_input}", 19, basic_text_color, change_observation_time_button.x_position, change_observation_time_button.y_position + 50)
+    
+    if manual_ra_dec_button.state == True:
+        draw_txt(screen, f"like: ra,dec {manual_ra_dec_user_input}", 19, basic_text_color, manual_ra_dec_button.x_position, manual_ra_dec_button.y_position + 50)
 
     
     
