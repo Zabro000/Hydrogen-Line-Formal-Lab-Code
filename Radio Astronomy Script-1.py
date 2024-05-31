@@ -406,7 +406,6 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
         return None
     
 
-
    #Function that gets the ra and dec 
     try:
         ra_dec_list = virgo.equatorial(default_observation_coordinates['altitude'], default_observation_coordinates['azimuth'], 
@@ -425,14 +424,12 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
 
 
     az_alt_list = [default_observation_coordinates['azimuth'], default_observation_coordinates['altitude']]
-   
     default_observation_coordinates['azimuth and altitude list'] = az_alt_list
    
     default_observation_coordinates['right ascension'] = ra_dec_list[0]
     default_observation_coordinates['declination'] = ra_dec_list[1]
 
     ra_dec_list = [default_observation_coordinates['right ascension'], default_observation_coordinates['declination']]
-
     default_observation_coordinates['right ascension and declination list'] = ra_dec_list
 
     print("Done updating observtion coordinates! ", default_observation_coordinates)
@@ -601,10 +598,10 @@ while running:
             
             #If the mouse was clicked, this runs through to see if the mouse was over a button 
             #Button.on_or_off_button_click(color_button, pygame.mouse.get_pos())
-            Button.on_or_off_button_click(continue_button, pygame.mouse.get_pos())
+            click_state_1 = Button.on_or_off_button_click(continue_button, pygame.mouse.get_pos())
             click_state_2 = Button.on_or_off_button_click(location_settings_button, pygame.mouse.get_pos())
 
-            if continue_button.state == True:
+            if continue_button.state == True and click_state_1 == True:
                 running = False
 
             
@@ -854,7 +851,6 @@ while running:
                 manual_ra_dec_user_input_parsed = user_update_ra_and_dec_list_parse(manual_ra_dec_user_input)
                 user_update_ra_and_dec(manual_ra_dec_user_input_parsed)
 
-
             elif event.key == pygame.K_BACKSPACE:
                 manual_ra_dec_user_input =  manual_ra_dec_user_input[:-1]
 
@@ -862,8 +858,6 @@ while running:
                 manual_ra_dec_user_input += event.unicode
             
             print(manual_ra_dec_user_input)
-
-
 
 
     screen.fill(main_screen_color)
@@ -900,7 +894,6 @@ while running:
     if manual_ra_dec_button.state == True:
         draw_txt(screen, f"like: ra,dec {manual_ra_dec_user_input}", 19, basic_text_color, manual_ra_dec_button.x_position, manual_ra_dec_button.y_position + 50)
 
-    
     
     end_of_game_loop_button_render(screen, screen_2_buttons)
 
