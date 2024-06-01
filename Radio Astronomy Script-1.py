@@ -64,6 +64,9 @@ observation_ra_dec = [observation_ra, observation_dec]
 observation_alt = 0 
 observation_az = 0
 observation_az_alt = [observation_az, observation_alt]
+observation_gal_long = 0
+observation_gal_lat = 0
+observation_gal_long_lat = [observation_gal_long]
 
 default_observation_coordinates = {
     'azimuth': observation_az,
@@ -71,7 +74,10 @@ default_observation_coordinates = {
     'azimuth and altitude list': observation_az_alt,
     'right ascension': observation_ra,
     'declination': observation_dec,
-    'right ascension and declination list': observation_ra_dec
+    'right ascension and declination list': observation_ra_dec,
+    'galactic longitude': observation_gal_long,
+    'galactic latitude': observation_gal_lat,
+    'galactic longitude and latitude list': observation_gal_long_lat
 }
 
 
@@ -360,7 +366,6 @@ def error_value_coordinates_assign() -> None:
         global default_observation_coordinates
         global default_location_parameters
 
-        
         error_value = 0
         error_list = [0,0]
 
@@ -370,6 +375,10 @@ def error_value_coordinates_assign() -> None:
         default_observation_coordinates['altitude'] = error_value
         default_observation_coordinates['azimuth'] = error_value
         default_observation_coordinates['azimuth and altitude list'] = error_list
+        default_observation_coordinates['galactic longitude'] = error_value
+        default_observation_coordinates['galactic latitude'] = error_value
+        default_observation_coordinates['galactic longitude and latitude list'] = error_list
+
 
 
 
@@ -482,9 +491,6 @@ def user_update_ra_and_dec(inputted_list) -> None:
     global default_observation_coordinates
     global default_location_parameters
 
-    
-    #Extra function just so I dont need to copy all the error value assign lines for each wrong case
-
     error_value = 0
     error_list = [0,0]
     total_right_ascension = 24
@@ -531,7 +537,29 @@ def user_update_ra_and_dec(inputted_list) -> None:
 
     print("Done updating the right ascension and declination. Note the altitude and azimuth does not line up now.")
     
-  
+#Converts ra and dec to the galactic coordinates. This is just so the code will be cleaner later
+def equatorial_to_galactic() -> None:
+    global default_observation_coordinates
+
+    right_ascension = default_observation_coordinates['right ascension']
+    declination = default_observation_coordinates['declination']
+
+    try:
+       galactic_long_lat_list =  virgo.galactic(ra= right_ascension, dec= declination)
+
+    #Maybe run the error asign function? Idk yet
+    except ValueError as error:
+        print("Conversion to galactic coordinates failed. ", error)
+        return None 
+    
+    default_observation_coordinates['galactic longitude'] = galactic_long_lat_list[0]
+    default_observation_coordinates['galactic latitude'] = galactic_long_lat_list[1]
+    default_observation_coordinates['galactic longitude and latitude list'] = [galactic_long_lat_list[0], galactic_long_lat_list[1]]
+
+    print("Done converting to galactic longitude and latitude. ", default_observation_coordinates['galactic longitude and latitude list'])
+        
+
+    
 
 #Mr.V's on screen text drawing function. It is really helpful!
 def draw_txt(surf, text, size, color, x, y):
@@ -807,8 +835,9 @@ while running:
             if event.key == pygame.K_RETURN:
                 print("Varibles set!")
                 manual_alt_az_user_input_parsed = user_change_az_alt_list_parse(manual_alt_az_user_input)
-                print("location settings parse", manual_alt_az_user_input_parsed)
                 user_change_az_alt_parse(manual_alt_az_user_input_parsed)
+
+                equatorial_to_galactic()
                 
             elif event.key == pygame.K_BACKSPACE:
                 manual_alt_az_user_input =  manual_alt_az_user_input[:-1]
@@ -841,6 +870,8 @@ while running:
                 print("Varibles set!")
                 manual_ra_dec_user_input_parsed = user_update_ra_and_dec_list_parse(manual_ra_dec_user_input)
                 user_update_ra_and_dec(manual_ra_dec_user_input_parsed)
+                
+                equatorial_to_galactic()
 
             elif event.key == pygame.K_BACKSPACE:
                 manual_ra_dec_user_input =  manual_ra_dec_user_input[:-1]
