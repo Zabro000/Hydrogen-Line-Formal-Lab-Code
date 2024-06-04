@@ -27,20 +27,6 @@ az_alt = None
 data_file_name = "Test data.dat"
 
 #initalizing dicts that is required for the obseravtion and ploting data
-default_observing_values = {
-    'dev_args': '',
-    'rf_gain': sdr_rf_gain,
-    'if_gain': if_gain,
-    'bb_gain': bb_gain,
-    'frequency': hydrogen_line_freq,
-    'bandwidth': observing_bandwidth,
-    'channels': channels,
-    't_sample': t_sample,
-    'duration': observing_time,
-    'loc': '',
-    'ra_dec': '',
-    'az_alt': ''
-}
 
 final_observing_values = {
     'dev_args': '',
@@ -85,14 +71,12 @@ default_observation_coordinates = {
 location_lat = 51
 location_lon = -114
 location_elevation = 1420 #m
-date = None
 
 default_location_parameters = {
     'lat': location_lat,
     'lon': location_lon,
     'height': location_elevation
 }
-
 
 
 ### Phidget spatial sensor attachment time
@@ -675,7 +659,6 @@ while running:
 
 
 
-
 ### Second loop for getting the observation ready, the functions for the user input is the same so there are only comments on the new bits
 manual_alt_az_button = Button("Manual Alt/Az", screen_width/2 - 600, screen_height/2 - 300)
 auto_alt_az_button = Button("Auto Alt Az", screen_width/2 - 600, screen_height/2 + 100)
@@ -796,17 +779,17 @@ while running:
 
             #Button that tries to run the obseravtion
             if temp_state_3 == True:
-                final_observing_values['loc']
-                final_observing_values['duration'] = observing_time
-                final_observing_values['rf_gain'] = sdr_rf_gain
-                final_observing_values['ra_dec'] = observation_ra_dec
-                final_observing_values['az_alt'] = observation_az_alt
+                final_observing_values['loc'] = f"{default_location_parameters['lat']} {default_location_parameters['lon']} {default_location_parameters['height']}"
+                final_observing_values['ra_dec'] = f"{default_observation_coordinates['right ascension']} {default_observation_coordinates['declination']}"
+                final_observing_values['az_alt'] = f"{default_observation_coordinates['azimuth']} {default_observation_coordinates['altitude']}"
 
                 observation_output_data_file_name, observation_image_plot_name, observation_csv_file_name = output_file_name_assigner_function()
-                print(observation_output_data_file_name)
+                
+                print("Name of output file: ", observation_output_data_file_name)
 
+                #Runs the observation
                 try: 
-                    virgo.observe(final_observing_values, 'wola', observation_output_data_file_name,start_in = observation_start_time)
+                    virgo.observe(final_observing_values, 'wola', observation_output_data_file_name, start_in = observation_start_time)
                     print("Observation is complete!")
                 except ModuleNotFoundError as error:
                     print("Check if the SDR is connected")
@@ -817,7 +800,7 @@ while running:
             if temp_state_4 == True: 
 
                 try: 
-                    virgo.plot(obs_parameters= default_observing_values, n = 20, m =35, f_rest= hydrogen_line_freq,
+                    virgo.plot(obs_parameters= final_observing_values, n = 20, m =35, f_rest= hydrogen_line_freq,
                                 vlsr=False, meta=False, avg_ylim=(-5,15), cal_ylim=(-20,260), obs_file= observation_output_data_file_name,
                                 rfi=[(1419.2e6, 1419.3e6), (1420.8e6, 1420.9e6)], dB=True, spectra_csv=observation_csv_file_name, plot_file=observation_image_plot_name)
                     
