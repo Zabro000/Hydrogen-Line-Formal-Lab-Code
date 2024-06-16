@@ -101,7 +101,9 @@ purple = (187, 153, 255)
 
 main_screen_color = white
 basic_text_color = black
-
+basic_text_size = 20
+basic_button_width = 200
+basic_button_height = 100
 # Using a dict to keep track of the different colors needed for each situation or state
 normal_button_colors = {'off': black, 'on': green, 'hover': purple}
 night_mode_button_colors = {'off': black, 'on': red, 'hover': other_red}
@@ -117,9 +119,19 @@ font_name = pygame.font.match_font('calibri')
 # Class for the on screen buttons
 class Button(pygame.sprite.Sprite):
 
-    def __init__(self, button_text, position_x, position_y, colors=None, state=None) -> None:
-        self.button_width = 200
-        self.button_height = 100
+    def __init__(self, button_text, position_x, position_y, button_width = None, button_height = None, colors=None, state=None, button_text_size = None) -> None:
+        
+        # This is to assign the size of the button before it is initalized in the parent class
+        if button_width is None:
+            self.button_width = basic_button_width
+        else:
+            self.button_width = button_width
+
+        if button_height is None:
+            self.button_height = basic_button_height
+        else:
+            self.button_height = button_height
+
 
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((self.button_width, self.button_height))
@@ -145,12 +157,18 @@ class Button(pygame.sprite.Sprite):
             self.state = bool(state)
 
         # Depending on the state, change the text and assign what the color is right now from the dict
-        if self.state == False:
+        if self.state is False:
             self.text_state = "off"
             self.current_color = self.colors['off']
         else:
             self.text_state = "selected"
             self.current_color = self.colors['on']
+
+        # This is for the button text size
+        if button_text_size is None:
+            self.button_text_size = basic_text_size
+        else:
+            self.button_text_size = button_text_size
 
         self.image.fill(self.current_color)
 
@@ -201,8 +219,10 @@ class Button(pygame.sprite.Sprite):
 
     # Method that prints the button's text and its state
     def draw_basic_button_text(self):
-        draw_txt(screen, self.button_text, 19, white, self.rect.centerx, self.rect.centery - 20)
-        draw_txt(screen, self.text_state, 19, white, self.rect.centerx, self.rect.centery)
+        # This moves the button's name up by however big the inputted font size is
+
+        draw_txt(screen, self.button_text, self.button_text_size, white, self.rect.centerx, self.rect.centery - self.button_text_size)
+        draw_txt(screen, self.text_state, self.button_text_size, white, self.rect.centerx, self.rect.centery)
 
 
 ### Normal functions:
@@ -650,6 +670,7 @@ manual_ra_dec_button = Button("Manual Ra/Dec", screen_width / 2 - 300, screen_he
 change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 300, screen_height / 2 + 300)
 select_file_to_plot_button = Button("Plot Selected File", screen_width / 2 + 600, screen_height / 2 + 300)
 plot_just_finished_observation_button = Button("Plot Data", screen_width / 2 + 600, screen_height / 2 + 100)
+small_test_button = Button("START: ", screen_width/2, screen_height/2, button_width = 50, button_height = 25, button_text_size = 10)
 
 screen_2_buttons = pygame.sprite.Group()
 screen_2_buttons.add(manual_alt_az_button)
@@ -661,6 +682,7 @@ screen_2_buttons.add(change_observation_time_button)
 # screen_2_buttons.add(select_file_to_plot_button)
 screen_2_buttons.add(plot_just_finished_observation_button)
 screen_2_buttons.add(manual_ra_dec_button)
+screen_2_buttons.add(small_test_button)
 
 running = True
 inital_time = time.time()

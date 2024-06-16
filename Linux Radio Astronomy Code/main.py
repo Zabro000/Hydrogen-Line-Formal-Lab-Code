@@ -8,4 +8,5 @@ fps = 30
 
 data: dict[str, int]= {"lh": 3.5}
 
-
+print("hiii")
+print(f"{fps = }")
