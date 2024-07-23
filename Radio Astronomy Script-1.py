@@ -234,18 +234,13 @@ def screen_color_change(object) -> None:
 
 # Function that creates the name of the data, png and csv spectra output files
 def output_file_name_assigner_function(sdr_gain=None, coordinates_dict=None, observation_time=None) -> str:
-    if sdr_gain == None:
+    if sdr_gain and observation_time == None:
         # Refers to thr rf gain for the sdr outside of this function
-        global sdr_rf_gain
-        sdr_gain = sdr_rf_gain
-
+        global final_observing_values
+   
     if coordinates_dict == None:
         global default_observation_coordinates
         coordinates_dict = default_observation_coordinates
-
-    if observation_time == None:
-        global observing_time
-        observation_time = observing_time
 
     global final_observing_values
 
@@ -463,8 +458,13 @@ def user_change_and_parse_observation_time(user_time_input) -> None:
         user_time_input = float(user_time_input)
 
     except ValueError as error:
-        print("Bad inputted value. ", error)
-        final_observing_values['duration'] = error_value
+        print("Bad input.", error)
+        final_observing_values['duration'] = error_value + observation_time_offset
+        return None
+    
+    if user_time_input <= 0:
+        print("Bad input because time has to be greater than zero.")
+        final_observing_values['duration'] = error_value + observation_time_offset
         return None
 
     final_observing_values['duration'] = user_time_input + observation_time_offset
@@ -777,12 +777,9 @@ while running:
 
             # Button that tries to run the obseravtion
             if temp_state_3 == True:
-                final_observing_values[
-                    'loc'] = f"{default_location_parameters['lat']} {default_location_parameters['lon']} {default_location_parameters['height']}"
-                final_observing_values[
-                    'ra_dec'] = f"{default_observation_coordinates['right ascension']} {default_observation_coordinates['declination']}"
-                final_observing_values[
-                    'az_alt'] = f"{default_observation_coordinates['azimuth']} {default_observation_coordinates['altitude']}"
+                final_observing_values['loc'] = f"{default_location_parameters['lat']} {default_location_parameters['lon']} {default_location_parameters['height']}"
+                final_observing_values['ra_dec'] = f"{default_observation_coordinates['right ascension']} {default_observation_coordinates['declination']}"
+                final_observing_values['az_alt'] = f"{default_observation_coordinates['azimuth']} {default_observation_coordinates['altitude']}"
 
                 observation_output_data_file_name, observation_image_plot_name, observation_csv_file_name = output_file_name_assigner_function()
 
