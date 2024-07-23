@@ -13,7 +13,7 @@ import os
 ### Virgo and radio astronomy varibles#
 observation_time_offset = 4
 
-observing_time = 60 + observation_time_offset  # in seconds
+observing_time = 60 # in seconds
 observation_start_time = 4  # in seconds
 sdr_rf_gain = 20
 if_gain = 25
@@ -233,16 +233,9 @@ def screen_color_change(object) -> None:
 
 
 # Function that creates the name of the data, png and csv spectra output files
-def output_file_name_assigner_function(sdr_gain=None, coordinates_dict=None, observation_time=None) -> str:
-    if sdr_gain and observation_time == None:
-        # Refers to thr rf gain for the sdr outside of this function
-        global final_observing_values
-   
-    if coordinates_dict == None:
-        global default_observation_coordinates
-        coordinates_dict = default_observation_coordinates
-
+def output_file_name_assigner_function() -> str:
     global final_observing_values
+    global default_observation_coordinates
 
     time_tuple = time.localtime()
 
@@ -255,12 +248,14 @@ def output_file_name_assigner_function(sdr_gain=None, coordinates_dict=None, obs
 
     round_num = 2
 
-    ra = round(coordinates_dict['right ascension'], round_num)
-    dec = round(coordinates_dict['declination'], round_num)
+    ra = round(default_observation_coordinates['right ascension'], round_num)
+    dec = round(default_observation_coordinates['declination'], round_num)
+    obs_time = final_observing_values['duration']
+    sdr_gain = round(final_observing_values['rf_gain'])
 
-    raw_data_file_name = f"HL Data; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {observation_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).dat"
-    plot_image_file_name = f"HL Plot; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {observation_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).png"
-    spectra_csv_file_name = f"HL CSV; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {observation_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).csv"
+    raw_data_file_name = f"HL Data; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).dat"
+    plot_image_file_name = f"HL Plot; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).png"
+    spectra_csv_file_name = f"HL CSV; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).csv"
 
     return raw_data_file_name, plot_image_file_name, spectra_csv_file_name
 
@@ -459,17 +454,17 @@ def user_change_and_parse_observation_time(user_time_input) -> None:
 
     except ValueError as error:
         print("Bad input.", error)
-        final_observing_values['duration'] = error_value + observation_time_offset
+        final_observing_values['duration'] = error_value
         return None
     
     if user_time_input <= 0:
         print("Bad input because time has to be greater than zero.")
-        final_observing_values['duration'] = error_value + observation_time_offset
+        final_observing_values['duration'] = error_value
         return None
 
-    final_observing_values['duration'] = user_time_input + observation_time_offset
+    final_observing_values['duration'] = user_time_input
 
-    print("Done updating the observation time!", final_observing_values['duration'] - observation_time_offset)
+    print("Done updating the observation time!", final_observing_values['duration'])
 
 
 def user_update_ra_and_dec_list_parse(inputted_list) -> str:
@@ -775,6 +770,7 @@ while running:
                 else:
                     print("The angle sensor is connected!")
 
+
             # Button that tries to run the obseravtion
             if temp_state_3 == True:
                 final_observing_values['loc'] = f"{default_location_parameters['lat']} {default_location_parameters['lon']} {default_location_parameters['height']}"
@@ -783,7 +779,10 @@ while running:
 
                 observation_output_data_file_name, observation_image_plot_name, observation_csv_file_name = output_file_name_assigner_function()
 
-                print("Name of output file: ", observation_output_data_file_name)
+                print("Raw data file name:", observation_output_data_file_name)
+
+                # Adds the offset only here because in all other uses the offset is not needed
+                final_observing_values['duration'] += observation_time_offset
 
                 # Runs the observation
                 try:
@@ -794,9 +793,12 @@ while running:
                     print("Check if the SDR is connected")
                     print(error)
 
+                # Removes the offset so it is not saved
+                final_observing_values['duration'] -= observation_time_offset
+
+
             # Button that plots the most resent data while the script was open
             if temp_state_4 == True:
-
                 try:
                     virgo.plot(obs_parameters=final_observing_values, n=20, m=35, f_rest=hydrogen_line_freq,
                                vlsr=False, meta=False, avg_ylim=(-5, 15), cal_ylim=(-20, 260),
@@ -809,6 +811,7 @@ while running:
 
             if temp_state_5 == True:
                 print("There is no code here yet.")
+
 
         # Text input for the alt and az and conversion to ra and dec, I need to add galatic cordinates
         if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
@@ -844,7 +847,7 @@ while running:
 
             print(observation_time_input)
 
-        # Input to manually change the ra and dec, it does not back calculate the alt and az though
+        # Input to manually change the ra and dec, it does not go back and calculate what the alt and az should be though
         elif event.type == pygame.KEYDOWN and manual_ra_dec_text_state == True:
 
             if event.key == pygame.K_RETURN:
@@ -882,7 +885,7 @@ while running:
     draw_txt(screen, display_coordinates_1, 20, basic_text_color, display_value_x_location, screen_height / 2 - 150)
     draw_txt(screen, display_coordinates_2, 20, basic_text_color, display_value_x_location, screen_height / 2 - 120)
 
-    draw_txt(screen, f"Observation Time: {final_observing_values['duration'] - observation_time_offset}(s)", 20,
+    draw_txt(screen, f"Observation Time: {final_observing_values['duration']}(s)", 20,
              basic_text_color, display_value_x_location, screen_height / 2 - 60)
     draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color,
              display_value_x_location, screen_height / 2 - 30)
@@ -902,11 +905,3 @@ while running:
     end_of_game_loop_button_render(screen, screen_2_buttons)
 
     pygame.display.flip()
-
-test = Observation("testinggg", default_observing_values, default_location_parameters)
-
-print(test.date)
-
-virgo.predict(default_location_parameters['lat'], default_location_parameters['lon'],
-              default_location_parameters['height'], source='Cas A', date='2024-4-20')
-virgo.map_hi(6, 45)
