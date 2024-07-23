@@ -5,6 +5,7 @@ import astropy
 import operator
 from Phidget22.Phidget import *
 from Phidget22.Devices.Spatial import *
+import os 
 
 # venv\Scripts\Activate.ps1
 
@@ -105,7 +106,7 @@ basic_text_size = 20
 basic_button_width = 200
 basic_button_height = 100
 # Using a dict to keep track of the different colors needed for each situation or state
-normal_button_colors = {'off': black, 'on': green, 'hover': purple}
+normal_button_colors = {'off': black, 'on': green, 'hover': light_green}
 night_mode_button_colors = {'off': black, 'on': red, 'hover': other_red}
 
 ### Starting pygame
@@ -670,7 +671,7 @@ manual_ra_dec_button = Button("Manual Ra/Dec", screen_width / 2 - 300, screen_he
 change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 300, screen_height / 2 + 300)
 select_file_to_plot_button = Button("Plot Selected File", screen_width / 2 + 600, screen_height / 2 + 300)
 plot_just_finished_observation_button = Button("Plot Data", screen_width / 2 + 600, screen_height / 2 + 100)
-small_test_button = Button("START: ", screen_width/2, screen_height/2, button_width = 50, button_height = 25, button_text_size = 10)
+small_test_button = Button("START: ", screen_width/2, screen_height/2, button_width = 70, button_height = 50, button_text_size = 14)
 
 screen_2_buttons = pygame.sprite.Group()
 screen_2_buttons.add(manual_alt_az_button)
