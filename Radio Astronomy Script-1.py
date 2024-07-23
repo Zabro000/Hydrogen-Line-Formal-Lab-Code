@@ -247,6 +247,8 @@ def output_file_name_assigner_function(sdr_gain=None, coordinates_dict=None, obs
         global observing_time
         observation_time = observing_time
 
+    global final_observing_values
+
     time_tuple = time.localtime()
 
     year = time_tuple.tm_year
