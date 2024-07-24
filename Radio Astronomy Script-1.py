@@ -79,6 +79,9 @@ default_location_parameters = {
     'height': location_elevation
 }
 
+### Data organizing varbiles
+data_folder_name = "Observation Data"
+
 ### Phidget spatial sensor attachment time
 attachment_time = 5 * 1000
 
@@ -105,6 +108,7 @@ basic_text_color = black
 basic_text_size = 20
 basic_button_width = 200
 basic_button_height = 100
+
 # Using a dict to keep track of the different colors needed for each situation or state
 normal_button_colors = {'off': black, 'on': green, 'hover': light_green}
 night_mode_button_colors = {'off': black, 'on': red, 'hover': other_red}
@@ -557,6 +561,40 @@ def equatorial_to_galactic() -> None:
 
     print("Done converting to galactic longitude and latitude. ",
           default_observation_coordinates['galactic longitude and latitude list'])
+    
+
+# Used to create a folder in the main directory
+def create_one_folder(folder_name) -> None:
+    folder_path = f"./{folder_name}"
+
+    try:
+        os.mkdir(folder_path)
+        print(f"A folder was created; its path is {folder_path}.")
+    except FileExistsError:
+        print(f"{folder_path} is a path that already exists.")
+
+def create_subfolder(top_level_folder, subfolder_name) -> None:
+    folder_path = f"./{top_level_folder}/{subfolder_name}"
+
+    try:
+        os.makedirs(folder_path)
+        print(f"A folder was created; its path is {folder_path}.")
+    except FileExistsError:
+        print(f"{folder_path} is a path that already exists.")
+
+
+# Used to create lots of subfoloers in a folder
+def create_subfolders(top_level_folder, subfolder_names) -> None:
+
+    for index in range(len(subfolder_names)):
+        sub_name = subfolder_names[index]
+        folder_path = f"./{top_level_folder}/{sub_name}"
+
+        try:
+            os.makedirs(folder_path)
+            print(f"A folder was created; its path is {folder_path}.")
+        except FileExistsError:
+            print(f"{folder_path} is a path that already exists.")
 
 
 # Mr.V's on screen text drawing function. It is really helpful!
