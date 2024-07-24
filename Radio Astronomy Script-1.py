@@ -700,7 +700,7 @@ while running:
 
         if event.type == pygame.QUIT:
             running = False
-            print("Program has been closed.")
+            print("Program has stopped.")
             # Raises basic error so the program will just stop
             raise WindowsError
 
