@@ -5,10 +5,10 @@ import astropy
 import operator
 from Phidget22.Phidget import *
 from Phidget22.Devices.Spatial import *
-import os 
+import os
+import shutil 
 
 # venv\Scripts\Activate.ps1
-
 
 ### Virgo and radio astronomy varibles ###
 observation_time_offset = 4
