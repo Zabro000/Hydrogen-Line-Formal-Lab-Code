@@ -263,6 +263,17 @@ def output_file_name_assigner_function() -> str:
 
     return raw_data_file_name, plot_image_file_name, spectra_csv_file_name
 
+def output_data_folder_name_assigner() -> str:
+    time_tuple = time.localtime()
+
+    year = time_tuple.tm_year
+    year_day = time_tuple.tm_yday
+    month = time_tuple.tm_mon
+    normal_day = time_tuple.tm_mday
+    hour = time_tuple.tm_hour
+    minute = time_tuple.tm_min
+
+    return f"HL Data From; {year} day {year_day} or {year}-{month}-{normal_day}"
 
 # Function that gets the time right now and returns it in a year, month, day format
 def parse_time() -> str:
@@ -563,6 +574,7 @@ def equatorial_to_galactic() -> None:
           default_observation_coordinates['galactic longitude and latitude list'])
     
 
+    
 # Used to create a folder in the main directory
 def create_one_folder(folder_name) -> None:
     folder_path = f"./{folder_name}"
@@ -572,6 +584,7 @@ def create_one_folder(folder_name) -> None:
         print(f"A folder was created; its path is {folder_path}.")
     except FileExistsError:
         print(f"{folder_path} is a path that already exists.")
+
 
 def create_subfolder(top_level_folder, subfolder_name) -> None:
     folder_path = f"./{top_level_folder}/{subfolder_name}"
@@ -597,6 +610,23 @@ def create_subfolders(top_level_folder, subfolder_names) -> None:
             print(f"{folder_path} is a path that already exists.")
 
 
+
+def general_data_folder_sort_function(top_level_folder) -> None:
+    #Move all the created files to where they should be (which dated folder and if it is a picture or a csv/list)
+    #If a csv/list then move to "raw data" else do nothing just keep it in the dated folder
+    #Move all files made on the same day to the folder for that date
+    #Check for duplicate folders and create a folder for a new date if need be (use try and except statements)
+
+    dated_data_folder = output_data_folder_name_assigner()
+
+    # Remember, because the name of the folder only has the date -- and not the time -- this functionality works, but if it had the time then 
+    # I would need more code to make sure it only creates a new folder everyday so it can be sorted by day
+    create_subfolder(top_level_folder, dated_data_folder)
+
+
+    ...
+
+
 # Mr.V's on screen text drawing function. It is really helpful!
 def draw_txt(surf, text, size, color, x, y):
     font = pygame.font.Font(font_name, size)
@@ -605,6 +635,9 @@ def draw_txt(surf, text, size, color, x, y):
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
 
+
+### Creating/ checking for folders ###
+create_one_folder(data_folder_name)
 
 ### First game loop for the starting screen ###
 # color_button = Button("Night Mode", screen_width/2, screen_height/2)
