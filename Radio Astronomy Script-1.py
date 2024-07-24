@@ -270,10 +270,8 @@ def output_data_folder_name_assigner() -> str:
     year_day = time_tuple.tm_yday
     month = time_tuple.tm_mon
     normal_day = time_tuple.tm_mday
-    hour = time_tuple.tm_hour
-    minute = time_tuple.tm_min
-
-    return f"HL Data From; {year} day {year_day} or {year}-{month}-{normal_day}"
+   
+    return f"HL Data From {year} day {year_day} or {year}-{month}-{normal_day}"
 
 # Function that gets the time right now and returns it in a year, month, day format
 def parse_time() -> str:
@@ -575,7 +573,7 @@ def equatorial_to_galactic() -> None:
     
 
     
-# Used to create a folder in the main directory
+# Used to create a folder in the root directory
 def create_one_folder(folder_name) -> None:
     folder_path = f"./{folder_name}"
 
@@ -586,15 +584,34 @@ def create_one_folder(folder_name) -> None:
         print(f"{folder_path} is a path that already exists.")
 
 
-def create_subfolder(top_level_folder, subfolder_name) -> None:
-    folder_path = f"./{top_level_folder}/{subfolder_name}"
+# Creates a subfolder in a folder in the root directory or creates a subfolder given any path
+def create_subfolder(subfolder_name, top_level_folder = None, subfolder_location_path = None) -> str:
+    
+    if top_level_folder is not None:
+        folder_path = f"./{top_level_folder}/{subfolder_name}"
 
-    try:
-        os.makedirs(folder_path)
-        print(f"A folder was created; its path is {folder_path}.")
-    except FileExistsError:
-        print(f"{folder_path} is a path that already exists.")
+        try:
+            os.makedirs(folder_path)
+            print(f"A folder was created; its path is {folder_path}.")
+        except FileExistsError:
+            print(f"{folder_path} is a path that already exists.")
 
+        return folder_path
+    
+    elif subfolder_location_path is not None: 
+        folder_path = f"{subfolder_location_path}/{subfolder_name}"
+
+        try:
+            os.makedirs(folder_path)
+            print(f"A folder was created; its path is {folder_path}.")
+        except FileExistsError:
+            print(f"{folder_path} is a path that already exists.")
+
+        return folder_path
+    
+    else:
+        print("A subfolder could not have been created")
+    
 
 # Used to create lots of subfoloers in a folder
 def create_subfolders(top_level_folder, subfolder_names) -> None:
@@ -611,20 +628,35 @@ def create_subfolders(top_level_folder, subfolder_names) -> None:
 
 
 
-def general_data_folder_sort_function(top_level_folder) -> None:
+
+def general_data_folder_sort_function(top_level_data_folder, picture_name, csv_name, dat_file_name) -> None:
     #Move all the created files to where they should be (which dated folder and if it is a picture or a csv/list)
     #If a csv/list then move to "raw data" else do nothing just keep it in the dated folder
     #Move all files made on the same day to the folder for that date
     #Check for duplicate folders and create a folder for a new date if need be (use try and except statements)
+    raw_data_folder_name ="Raw Data"
+    source_picture_path = f"./{picture_name}"
+    source_csv_path = f"./{csv_name}"
+    source_dat_path = f"./{dat_file_name}"
 
-    dated_data_folder = output_data_folder_name_assigner()
+    daily_observation_folder_name = output_data_folder_name_assigner()
 
     # Remember, because the name of the folder only has the date -- and not the time -- this functionality works, but if it had the time then 
     # I would need more code to make sure it only creates a new folder everyday so it can be sorted by day
-    create_subfolder(top_level_folder, dated_data_folder)
 
+    daily_observation_folder_path = create_subfolder(daily_observation_folder_name, top_level_folder = top_level_data_folder)
+    print(f"{daily_observation_folder_path = }")
+    
+    raw_data_folder_path = create_subfolder(raw_data_folder_name, subfolder_location_path = daily_observation_folder_path)
 
-    ...
+    destination_picture_path = f"{daily_observation_folder_path}/{picture_name}"
+    destination_csv_path = f"{raw_data_folder_path}/{csv_name}"
+    destination_dat_path = f"{raw_data_folder_path}/{dat_file_name}"
+
+    shutil.move(source_picture_path, destination_picture_path)
+    shutil.move(source_csv_path, destination_csv_path)
+    shutil.move(source_dat_path, destination_dat_path)
+
 
 
 # Mr.V's on screen text drawing function. It is really helpful!
@@ -876,9 +908,14 @@ while running:
                                obs_file=observation_output_data_file_name,
                                rfi=[(1419.2e6, 1419.3e6), (1420.8e6, 1420.9e6)], dB=True,
                                spectra_csv=observation_csv_file_name, plot_file=observation_image_plot_name)
+                    
+                    
+                    general_data_folder_sort_function(data_folder_name, observation_image_plot_name, observation_csv_file_name, observation_output_data_file_name)
 
                 except Exception as error:
-                    print("Propably no observation has been done while this was open", error)
+                    print("Propably no observation has been done yet.", error)
+
+
 
             if temp_state_5 == True:
                 print("There is no code here yet.")
