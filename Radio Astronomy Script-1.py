@@ -558,7 +558,7 @@ def equatorial_to_galactic() -> None:
     try:
         galactic_long_lat_list = virgo.galactic(ra=right_ascension, dec=declination)
 
-    # Maybe run the error asign function? Idk yet
+    # Maybe run the error assign function? Idk yet
     except ValueError as error:
         print("Conversion to galactic coordinates failed. ", error)
         return None
@@ -700,7 +700,7 @@ while running:
 
         if event.type == pygame.QUIT:
             running = False
-            print("Program will hult now!")
+            print("Program has been closed.")
             # Raises basic error so the program will just stop
             raise WindowsError
 
@@ -959,7 +959,7 @@ while running:
         elif event.type == pygame.KEYDOWN and manual_ra_dec_text_state == True:
 
             if event.key == pygame.K_RETURN:
-                print("Varibles set!")
+                print("Variables set!")
                 manual_ra_dec_user_input_parsed = user_update_ra_and_dec_list_parse(manual_ra_dec_user_input)
                 user_update_ra_and_dec(manual_ra_dec_user_input_parsed)
 
