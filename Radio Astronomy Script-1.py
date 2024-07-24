@@ -903,10 +903,10 @@ while running:
             # Button that plots the most resent data while the script was open
             if temp_state_4 == True:
                 try:
-                    virgo.plot(obs_parameters=final_observing_values, n=40, m=45, f_rest=hydrogen_line_freq,
-                               vlsr=True, meta=True, avg_ylim=(-5, 15), cal_ylim=(-20, 260),
+                    virgo.plot(obs_parameters=final_observing_values, n=30, m=35, f_rest=hydrogen_line_freq,
+                               vlsr=True, meta=False, avg_ylim=(-5, 15), cal_ylim=(-20, 260),
                                obs_file=observation_output_data_file_name,
-                               rfi=[(1419.2e6, 1419.3e6), (1420.8e6, 1420.9e6)], dB=True,
+                               rfi=[(1419.2e6, 1419.3e6), (1420.8e6, 1420.9e6)], dB=False,
                                spectra_csv=observation_csv_file_name, plot_file=observation_image_plot_name)
                     
                     
