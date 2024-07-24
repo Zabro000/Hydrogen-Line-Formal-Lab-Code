@@ -16,6 +16,8 @@ obs = {
     'az_alt': ''
 }
 
+
+
 # Analyze and export data as csv
 virgo.plot(obs_parameters=obs, n=10, m=25, f_rest=1420.4057517667e6,
            obs_file='observation.dat', cal_file='calibration.dat',

@@ -889,7 +889,7 @@ while running:
 
                 # Runs the observation
                 try:
-                    virgo.observe(final_observing_values, 'wola', observation_output_data_file_name,
+                    virgo.observe(final_observing_values, spectrometer= 'wola', obs_file= observation_output_data_file_name,
                                   start_in=observation_start_time)
                     print("Observation is complete!")
                 except ModuleNotFoundError as error:
@@ -904,10 +904,8 @@ while running:
             if temp_state_4 == True:
                 try:
                     virgo.plot(obs_parameters=final_observing_values, n=30, m=35, f_rest=hydrogen_line_freq,
-                               vlsr=True, meta=False, avg_ylim=(-5, 15), cal_ylim=(-20, 260),
-                               obs_file=observation_output_data_file_name,
-                               rfi=[(1419.2e6, 1419.3e6), (1420.8e6, 1420.9e6)], dB=False,
-                               spectra_csv=observation_csv_file_name, plot_file=observation_image_plot_name)
+                               obs_file="observation.dat", dB=True,
+                               spectra_csv=observation_csv_file_name, power_csv="MY time series.csv", plot_file=observation_image_plot_name)
                     
                     
                     general_data_folder_sort_function(data_folder_name, observation_image_plot_name, observation_csv_file_name, observation_output_data_file_name)
