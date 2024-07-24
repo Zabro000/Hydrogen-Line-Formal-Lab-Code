@@ -904,7 +904,7 @@ while running:
             if temp_state_4 == True:
                 try:
                     virgo.plot(obs_parameters=final_observing_values, n=30, m=35, f_rest=hydrogen_line_freq,
-                               obs_file="observation.dat", dB=True,
+                               obs_file= observation_output_data_file_name, dB=True, cal_file= "calibration.dat",
                                spectra_csv=observation_csv_file_name, power_csv="MY time series.csv", plot_file=observation_image_plot_name)
                     
                     
