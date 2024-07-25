@@ -812,9 +812,8 @@ run_observation_button = Button("Begin Observation", screen_width / 2 + 600, scr
 manual_ra_dec_button = Button("Manual Ra/Dec", screen_width / 2 - 300, screen_height / 2 + 100)
 change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 300, screen_height / 2 + 300, button_text_size= 17)
 change_calibration_time_button = Button("Change Calibration Time", screen_width / 2 - 0, screen_height / 2 + 300, button_text_size= 17)
-select_file_to_plot_button = Button("Plot Selected File", screen_width / 2 + 600, screen_height / 2 + 300)
+sort_calibration_files_button = Button("Sort Cal Files", screen_width / 2 + 540, screen_height / 2 + 185, button_width = 80, button_height = 50, button_text_size = 14)
 plot_just_finished_observation_button = Button("Plot Data", screen_width / 2 + 600, screen_height / 2 + 100)
-small_test_button = Button("START: ", screen_width/2, screen_height/2, button_width = 70, button_height = 50, button_text_size = 14)
 begin_calibration_button = Button("Begin Calibration",screen_width / 2 + 600, screen_height / 2 - 300)
 
 screen_2_buttons = pygame.sprite.Group()
@@ -824,10 +823,9 @@ screen_2_buttons.add(hi_display_button)
 screen_2_buttons.add(test_spatial_phidget_button)
 screen_2_buttons.add(run_observation_button)
 screen_2_buttons.add(change_observation_time_button)
-# screen_2_buttons.add(select_file_to_plot_button)
 screen_2_buttons.add(plot_just_finished_observation_button)
 screen_2_buttons.add(manual_ra_dec_button)
-screen_2_buttons.add(small_test_button)
+screen_2_buttons.add(sort_calibration_files)
 screen_2_buttons.add(begin_calibration_button)
 screen_2_buttons.add(change_calibration_time_button)
 
@@ -899,6 +897,7 @@ while running:
             temp_state_3 = Button.doer_button_click(run_observation_button, pygame.mouse.get_pos())
             temp_state_4 = Button.doer_button_click(plot_just_finished_observation_button, pygame.mouse.get_pos())
             temp_state_6 = Button.doer_button_click(begin_calibration_button, pygame.mouse.get_pos())
+            temp_state_7 = Button.doer_button_click(sort_calibration_files_button, pygame.mouse.get_pos())
             click_state_2 = Button.on_or_off_button_click(change_observation_time_button, pygame.mouse.get_pos())
             click_state_3 = Button.on_or_off_button_click(manual_ra_dec_button, pygame.mouse.get_pos())
             click_state_4 = Button.on_or_off_button_click(change_calibration_time_button, pygame.mouse.get_pos())
@@ -948,6 +947,15 @@ while running:
                     print("The angle sensor is connected!")
 
 
+            # Lets the user sort and store the calibration files when they are done with them
+            if temp_state_7 is True:
+                try:
+                    general_data_sorter_function(general_data_folder_name, calibration= calibration_raw_data_file_name, 
+                                                 calibration_header= calibration_dat_file_header_name)
+                except FileNotFoundError as error_:
+                    print("The calibration file does not exit or has been sorted already.", error_)
+
+
             # Button that runs an obseravtion for a calibration file
             if temp_state_6 == True:
                 final_observing_values['loc'] = f"{default_location_parameters['lat']} {default_location_parameters['lon']} {default_location_parameters['height']}"
@@ -971,7 +979,7 @@ while running:
                 try: 
                     virgo.observe(final_observing_values, spectrometer= 'wola', obs_file= calibration_raw_data_file_name,
                                   start_in=observation_start_time)
-                    print("Calibration observation complete!")
+                    print("Calibration complete!")
                 except ModuleNotFoundError as error_:
                     print("Check if the SDR is connected")
                     print(error_)
@@ -1020,8 +1028,7 @@ while running:
                                spectra_csv=observation_spectra_output_csv, power_csv=observation_power_vs_time_output_csv, plot_file=observation_image_plot_name)
                     
                     general_data_sorter_function(general_data_folder_name, observation_data=observation_output_data_file_name, 
-                                                 observation_header = observation_output_data_header_file_name, calibration = calibration_raw_data_file_name, 
-                                                 calibration_header= calibration_dat_file_header_name, spectra_csv = observation_spectra_output_csv, 
+                                                 observation_header = observation_output_data_header_file_name, spectra_csv = observation_spectra_output_csv, 
                                                  power_csv = observation_power_vs_time_output_csv, data_plot = observation_image_plot_name)
 
                 except Exception as error:
