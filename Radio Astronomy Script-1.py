@@ -238,7 +238,7 @@ def screen_color_change(object) -> None:
 
 
 # Function that creates the name of the data, png and csv spectra output files
-def output_file_name_creator() -> str:
+def output_file_name_creator() -> dict:
     global final_observing_values
     global default_observation_coordinates
 
@@ -265,8 +265,15 @@ def output_file_name_creator() -> str:
     calibration_file_name= f"HI Calibration; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).dat"
     plotted_data_file_name = f"HI Plot; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).png"
     spectra_csv_file_name = f"HI CSV; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).csv"
+    hydrogen_map_file_name = f"HI Map; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).png"
 
-    return raw_data_file_name, plotted_data_file_name, spectra_csv_file_name, calibration_file_name
+    name_dict = {'raw data': raw_data_file_name, 
+                 'plotted data figure': plotted_data_file_name, 
+                 'spectra csv': spectra_csv_file_name, 
+                 'calibration file': calibration_file_name,
+                 'HI map': hydrogen_map_file_name}
+
+    return name_dict
 
 def output_data_folder_name_assigner() -> str:
     time_tuple = time.localtime()
@@ -762,7 +769,7 @@ while running:
 ### Second loop for getting the observation ready, the functions for the user input is the same so there are only comments on the new bits
 manual_alt_az_button = Button("Manual Alt/Az", screen_width / 2 - 600, screen_height / 2 - 300)
 auto_alt_az_button = Button("Auto Alt Az", screen_width / 2 - 600, screen_height / 2 + 100)
-hi_display_button = Button("Show Hydrogen Map", screen_width / 2 - 600, screen_height / 2 + 300)
+hi_display_button = Button("Create Hydrogen Map", screen_width / 2 - 600, screen_height / 2 + 300)
 test_spatial_phidget_button = Button("Test Phidget", screen_width / 2 - 600, screen_height / 2 - 100)
 run_observation_button = Button("Begin Observation", screen_width / 2 + 600, screen_height / 2 - 100)
 manual_ra_dec_button = Button("Manual Ra/Dec", screen_width / 2 - 300, screen_height / 2 + 100)
@@ -799,6 +806,7 @@ observation_image_plot_name = None
 observation_csv_file_name = None
 calibration_dat_file_name = None 
 temp_calibration_dat_file_name = None
+file_name_dict = None
 
 manual_alt_az_text_state = False
 manual_alt_az_user_input = " "
@@ -879,8 +887,13 @@ while running:
 
             # Displays a map of the hydrogen line strength and a dot to show where the antenna is pointed at
             if temp_state_1 == True:
-                virgo.map_hi(default_observation_coordinates['right ascension'],
-                             default_observation_coordinates['declination'])
+                file_name_dict = output_file_name_creator()
+                try:
+                    virgo.map_hi(default_observation_coordinates['right ascension'],
+                                default_observation_coordinates['declination'], plot_file= file_name_dict['HI map'])
+                except Exception as error_:
+                    print("Creating a map of the hydrogen line signal strength was unsuccessful. ", error_)
+
 
             # Tries to initalize the angle phidget sensor
             if temp_state_2 == True:
@@ -899,7 +912,11 @@ while running:
                 final_observing_values['ra_dec'] = f"{default_observation_coordinates['right ascension']} {default_observation_coordinates['declination']}"
                 final_observing_values['az_alt'] = f"{default_observation_coordinates['azimuth']} {default_observation_coordinates['altitude']}"
 
-                observation_output_data_file_name, observation_image_plot_name, observation_csv_file_name, temp_calibration_dat_file_name = output_file_name_creator()
+                file_name_dict = output_file_name_creator()
+                observation_output_data_file_name = file_name_dict['raw data']
+                observation_image_plot_name = file_name_dict['plotted data figure']
+                observation_csv_file_name = file_name_dict['spectra csv']
+
 
                 print("Raw data file name:", observation_output_data_file_name)
 
@@ -929,7 +946,8 @@ while running:
                 temp_real_observation_time = final_observing_values['duration']
                 final_observing_values['duration'] = calibration_duration
                 
-                observation_output_data_file_name, observation_image_plot_name, observation_csv_file_name, calibration_dat_file_name = output_file_name_creator()
+                file_name_dict = output_file_name_creator()
+                calibration_dat_file_name = file_name_dict['calibration file']
 
                 print("Calibration file name:", calibration_dat_file_name)
                 print(f"{final_observing_values['duration'] = }")
