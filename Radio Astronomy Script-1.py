@@ -931,6 +931,8 @@ while running:
 
                 temp_real_observation_time = final_observing_values['duration']
                 final_observing_values['duration'] = calibration_duration + observation_time_offset
+                print(f"{final_observing_values['duration'] = }")
+
 
                 try: 
                     virgo.observe(final_observing_values, spectrometer= 'wola', obs_file= calibration_dat_file_name,
@@ -941,6 +943,8 @@ while running:
                     print(error_)
 
                 final_observing_values['duration'] = temp_real_observation_time
+
+                print(f"{final_observing_values['duration'] = }")
 
 
 
@@ -965,7 +969,7 @@ while running:
         if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
 
             if event.key == pygame.K_RETURN:
-                print("Varibles set!")
+                print("Alt, az, ra and dec set.")
 
                 manual_alt_az_user_input_parsed = user_change_az_alt_list_parse(manual_alt_az_user_input)
                 user_change_az_alt_parse(manual_alt_az_user_input_parsed)
@@ -984,7 +988,7 @@ while running:
         elif event.type == pygame.KEYDOWN and observation_time_text_state == True:
 
             if event.key == pygame.K_RETURN:
-                print("Varibles set!")
+                print("Observation duration set.")
                 final_observing_values["duration"] = user_change_and_parse_observation_time(observation_time_input)
 
             elif event.key == pygame.K_BACKSPACE:
@@ -1000,7 +1004,7 @@ while running:
         elif event.type == pygame.KEYDOWN and calibration_duration_text_state == True:
 
             if event.key == pygame.K_RETURN:
-                print("Varibles set!")
+                print("Calibration duration set.")
                 calibration_duration = user_change_and_parse_observation_time(calibration_duration_input)
 
             elif event.key == pygame.K_BACKSPACE:
@@ -1016,7 +1020,7 @@ while running:
         elif event.type == pygame.KEYDOWN and manual_ra_dec_text_state == True:
 
             if event.key == pygame.K_RETURN:
-                print("Variables set!")
+                print("Ra and dec set.")
                 manual_ra_dec_user_input_parsed = user_update_ra_and_dec_list_parse(manual_ra_dec_user_input)
                 user_update_ra_and_dec(manual_ra_dec_user_input_parsed)
 
@@ -1058,18 +1062,18 @@ while running:
              display_value_x_location, screen_height / 2)
 
     if manual_alt_az_button.state == True:
-        draw_txt(screen, f"like: az,alt {manual_alt_az_user_input}", 19, basic_text_color,
+        draw_txt(screen, f"Like: az,alt {manual_alt_az_user_input}", 19, basic_text_color,
                  manual_alt_az_button.x_position, manual_alt_az_button.y_position + 50)
 
     if change_observation_time_button.state == True:
-        draw_txt(screen, f"like: time {observation_time_input}", 19, basic_text_color,
+        draw_txt(screen, f"Like: time {observation_time_input}", 19, basic_text_color,
                  change_observation_time_button.x_position, change_observation_time_button.y_position + 50)
     
     if change_calibration_time_button.state:
-        draw_txt(screen, f"like: time {calibration_duration_input}", 19, basic_text_color,change_calibration_time_button.x_position, change_calibration_time_button.y_position + 50 )
+        draw_txt(screen, f"Like: time {calibration_duration_input}", 19, basic_text_color,change_calibration_time_button.x_position, change_calibration_time_button.y_position + 50 )
 
     if manual_ra_dec_button.state == True:
-        draw_txt(screen, f"like: ra,dec {manual_ra_dec_user_input}", 19, basic_text_color,
+        draw_txt(screen, f"Like: ra,dec {manual_ra_dec_user_input}", 19, basic_text_color,
                  manual_ra_dec_button.x_position, manual_ra_dec_button.y_position + 50)
 
     end_of_game_loop_button_render(screen, screen_2_buttons)
