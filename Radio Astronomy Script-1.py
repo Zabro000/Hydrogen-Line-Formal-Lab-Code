@@ -815,6 +815,10 @@ manual_ra_dec_text_state = False
 manual_ra_dec_user_input = " "
 manual_ra_dec_user_input_parsed = " "
 
+calibration_duration_text_state = False
+calibration_duration_input = " "
+calibration_duration_input_parsed = " "
+
 display_clock = None
 display_location = None
 display_coordinates_1 = None
@@ -824,7 +828,7 @@ display_round = 2
 width_constant = -260
 display_value_x_location = screen_width / 2 + width_constant
 
-calibration_duration = 120 # I already defined this varabile at the start of the script so this is here so I can know what is going on
+calibration_duration = 10 # I already defined this varabile at the start of the script so this is here so I can know what is going on
 
 screen.fill(main_screen_color)
 pygame.display.flip()
@@ -851,6 +855,7 @@ while running:
             temp_state_6 = Button.doer_button_click(begin_calibration_button, pygame.mouse.get_pos())
             click_state_2 = Button.on_or_off_button_click(change_observation_time_button, pygame.mouse.get_pos())
             click_state_3 = Button.on_or_off_button_click(manual_ra_dec_button, pygame.mouse.get_pos())
+            click_state_4 = Button.on_or_off_button_click(change_calibration_time_button, pygame.mouse.get_pos())
 
 
             # This handles the manual alt and az input from the user
@@ -868,6 +873,12 @@ while running:
                 manual_ra_dec_text_state = True
             else:
                 manual_ra_dec_text_state = False
+
+            if change_calibration_time_button.state and click_state_4:
+                calibration_duration_text_state = True
+            else:
+                calibration_duration_text_state = False
+
 
             # Displays a map of the hydrogen line strength and a dot to show where the antenna is pointed at
             if temp_state_1 == True:
@@ -943,7 +954,6 @@ while running:
                                obs_file= observation_output_data_file_name, dB=True, cal_file= calibration_dat_file_name,
                                spectra_csv=observation_csv_file_name, power_csv="MY time series.csv", plot_file=observation_image_plot_name)
                     
-                    
                     general_data_folder_sort_function(data_folder_name, observation_image_plot_name, observation_csv_file_name, observation_output_data_file_name)
 
                 except Exception as error:
@@ -952,8 +962,6 @@ while running:
            
             if temp_state_5 == True:
                 print("There is no code here yet.")
-
-                
 
 
         # Text input for the alt and az and conversion to ra and dec, I need to add galatic cordinates
@@ -989,6 +997,8 @@ while running:
                 observation_time_input += event.unicode
 
             print(observation_time_input)
+
+        
 
         # Input to manually change the ra and dec, it does not go back and calculate what the alt and az should be though
         elif event.type == pygame.KEYDOWN and manual_ra_dec_text_state == True:
