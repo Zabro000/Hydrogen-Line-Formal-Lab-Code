@@ -458,28 +458,25 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
 
 
 # This function parses and chnages the observation time
-def user_change_and_parse_observation_time(user_time_input) -> None:
-    global final_observing_values
-    global observation_time_offset
+def user_change_and_parse_observation_time(user_time_input, error_value = None) -> float:
+    if error_value is None:
+        error_value = 10.0
 
-    error_value = 10
+    global observation_time_offset
 
     try:
         user_time_input = float(user_time_input)
 
     except ValueError as error:
         print("Bad input.", error)
-        final_observing_values['duration'] = error_value
-        return None
+        return error_value
     
     if user_time_input <= 0:
         print("Bad input because time has to be greater than zero.")
-        final_observing_values['duration'] = error_value
-        return None
+        return error_value
 
-    final_observing_values['duration'] = user_time_input
-
-    print("Done updating the observation time!", final_observing_values['duration'])
+    print("Done updating the observation/calibration time!")
+    return user_time_input
 
 
 def user_update_ra_and_dec_list_parse(inputted_list) -> str:
@@ -964,14 +961,14 @@ while running:
                 print("There is no code here yet.")
 
 
-        # Text input for the alt and az and conversion to ra and dec, I need to add galatic cordinates
+        # Text input for the alt and az and conversion to ra and dec
         if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
 
             if event.key == pygame.K_RETURN:
                 print("Varibles set!")
+
                 manual_alt_az_user_input_parsed = user_change_az_alt_list_parse(manual_alt_az_user_input)
                 user_change_az_alt_parse(manual_alt_az_user_input_parsed)
-
                 equatorial_to_galactic()
 
             elif event.key == pygame.K_BACKSPACE:
@@ -983,12 +980,12 @@ while running:
             print(manual_alt_az_user_input)
 
 
-        # Text input for observation time
+        # Input to change the observation duration
         elif event.type == pygame.KEYDOWN and observation_time_text_state == True:
 
             if event.key == pygame.K_RETURN:
                 print("Varibles set!")
-                user_change_and_parse_observation_time(observation_time_input)
+                final_observing_values["duration"] = user_change_and_parse_observation_time(observation_time_input)
 
             elif event.key == pygame.K_BACKSPACE:
                 observation_time_input = observation_time_input[:-1]
@@ -999,7 +996,22 @@ while running:
             print(observation_time_input)
 
         
+        # Input to change the calibration duration 
+        elif event.type == pygame.KEYDOWN and calibration_duration_text_state == True:
 
+            if event.key == pygame.K_RETURN:
+                print("Varibles set!")
+                calibration_duration = user_change_and_parse_observation_time(calibration_duration_input)
+
+            elif event.key == pygame.K_BACKSPACE:
+                calibration_duration_input = calibration_duration_input[:-1]
+
+            else:
+                calibration_duration_input += event.unicode
+
+            print(calibration_duration_input)
+
+        
         # Input to manually change the ra and dec, it does not go back and calculate what the alt and az should be though
         elif event.type == pygame.KEYDOWN and manual_ra_dec_text_state == True:
 
@@ -1040,8 +1052,10 @@ while running:
 
     draw_txt(screen, f"Observation Time: {final_observing_values['duration']}(s)", 20,
              basic_text_color, display_value_x_location, screen_height / 2 - 60)
+    draw_txt(screen, f"Calibration Time: {calibration_duration}(s)", 20,
+             basic_text_color, display_value_x_location, screen_height / 2 - 30)
     draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color,
-             display_value_x_location, screen_height / 2 - 30)
+             display_value_x_location, screen_height / 2)
 
     if manual_alt_az_button.state == True:
         draw_txt(screen, f"like: az,alt {manual_alt_az_user_input}", 19, basic_text_color,
@@ -1050,6 +1064,9 @@ while running:
     if change_observation_time_button.state == True:
         draw_txt(screen, f"like: time {observation_time_input}", 19, basic_text_color,
                  change_observation_time_button.x_position, change_observation_time_button.y_position + 50)
+    
+    if change_calibration_time_button.state:
+        draw_txt(screen, f"like: time {calibration_duration_input}", 19, basic_text_color,change_calibration_time_button.x_position, change_calibration_time_button.y_position + 50 )
 
     if manual_ra_dec_button.state == True:
         draw_txt(screen, f"like: ra,dec {manual_ra_dec_user_input}", 19, basic_text_color,
