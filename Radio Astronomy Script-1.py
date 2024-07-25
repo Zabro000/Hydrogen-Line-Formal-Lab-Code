@@ -13,7 +13,8 @@ import shutil
 ### Virgo and radio astronomy varibles ###
 observation_time_offset = 4
 
-observing_time = 60 # in seconds
+observing_time = 10 # in seconds
+calibration_duration = 120 # in seconds
 observation_start_time = 4  # in seconds
 sdr_rf_gain = 20
 if_gain = 25
@@ -237,7 +238,7 @@ def screen_color_change(object) -> None:
 
 
 # Function that creates the name of the data, png and csv spectra output files
-def output_file_name_assigner_function() -> str:
+def output_file_name_creator() -> str:
     global final_observing_values
     global default_observation_coordinates
 
@@ -250,6 +251,9 @@ def output_file_name_assigner_function() -> str:
     hour = time_tuple.tm_hour
     minute = time_tuple.tm_min
 
+    if float(minute) < 10:
+        minute = str(f"0{minute}")
+
     round_num = 2
 
     ra = round(default_observation_coordinates['right ascension'], round_num)
@@ -257,11 +261,12 @@ def output_file_name_assigner_function() -> str:
     obs_time = final_observing_values['duration']
     sdr_gain = round(final_observing_values['rf_gain'])
 
-    raw_data_file_name = f"HL Data; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).dat"
-    plot_image_file_name = f"HL Plot; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).png"
-    spectra_csv_file_name = f"HL CSV; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).csv"
+    raw_data_file_name = f"HI Data; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).dat"
+    calibration_file_name= f"HI Calibration; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).dat"
+    plotted_data_file_name = f"HI Plot; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).png"
+    spectra_csv_file_name = f"HI CSV; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).csv"
 
-    return raw_data_file_name, plot_image_file_name, spectra_csv_file_name
+    return raw_data_file_name, plotted_data_file_name, spectra_csv_file_name, calibration_file_name
 
 def output_data_folder_name_assigner() -> str:
     time_tuple = time.localtime()
@@ -296,9 +301,6 @@ def display_time() -> str:
     hour = time_tuple.tm_hour
     minute = time_tuple.tm_min
     second = time_tuple.tm_sec
-
-    if float(hour) < 10:
-        hour = str(f"0{hour}")
 
     if float(minute) < 10:
         minute = str(f"0{minute}")
@@ -456,28 +458,25 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
 
 
 # This function parses and chnages the observation time
-def user_change_and_parse_observation_time(user_time_input) -> None:
-    global final_observing_values
-    global observation_time_offset
+def user_change_and_parse_observation_time(user_time_input, error_value = None) -> float:
+    if error_value is None:
+        error_value = 10.0
 
-    error_value = 10
+    global observation_time_offset
 
     try:
         user_time_input = float(user_time_input)
 
     except ValueError as error:
         print("Bad input.", error)
-        final_observing_values['duration'] = error_value
-        return None
+        return error_value
     
     if user_time_input <= 0:
         print("Bad input because time has to be greater than zero.")
-        final_observing_values['duration'] = error_value
-        return None
+        return error_value
 
-    final_observing_values['duration'] = user_time_input
-
-    print("Done updating the observation time!", final_observing_values['duration'])
+    print("Done updating the observation/calibration time!")
+    return user_time_input
 
 
 def user_update_ra_and_dec_list_parse(inputted_list) -> str:
@@ -565,8 +564,7 @@ def equatorial_to_galactic() -> None:
 
     default_observation_coordinates['galactic longitude'] = galactic_long_lat_list[0]
     default_observation_coordinates['galactic latitude'] = galactic_long_lat_list[1]
-    default_observation_coordinates['galactic longitude and latitude list'] = [galactic_long_lat_list[0],
-                                                                               galactic_long_lat_list[1]]
+    default_observation_coordinates['galactic longitude and latitude list'] = [galactic_long_lat_list[0], galactic_long_lat_list[1]]
 
     print("Done converting to galactic longitude and latitude. ",
           default_observation_coordinates['galactic longitude and latitude list'])
@@ -768,10 +766,12 @@ hi_display_button = Button("Show Hydrogen Map", screen_width / 2 - 600, screen_h
 test_spatial_phidget_button = Button("Test Phidget", screen_width / 2 - 600, screen_height / 2 - 100)
 run_observation_button = Button("Begin Observation", screen_width / 2 + 600, screen_height / 2 - 100)
 manual_ra_dec_button = Button("Manual Ra/Dec", screen_width / 2 - 300, screen_height / 2 + 100)
-change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 300, screen_height / 2 + 300)
+change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 300, screen_height / 2 + 300, button_text_size= 17)
+change_calibration_time_button = Button("Change Calibration Time", screen_width / 2 - 0, screen_height / 2 + 300, button_text_size= 17)
 select_file_to_plot_button = Button("Plot Selected File", screen_width / 2 + 600, screen_height / 2 + 300)
 plot_just_finished_observation_button = Button("Plot Data", screen_width / 2 + 600, screen_height / 2 + 100)
 small_test_button = Button("START: ", screen_width/2, screen_height/2, button_width = 70, button_height = 50, button_text_size = 14)
+begin_calibration_button = Button("Begin Calibration",screen_width / 2 + 600, screen_height / 2 - 300)
 
 screen_2_buttons = pygame.sprite.Group()
 screen_2_buttons.add(manual_alt_az_button)
@@ -784,6 +784,8 @@ screen_2_buttons.add(change_observation_time_button)
 screen_2_buttons.add(plot_just_finished_observation_button)
 screen_2_buttons.add(manual_ra_dec_button)
 screen_2_buttons.add(small_test_button)
+screen_2_buttons.add(begin_calibration_button)
+screen_2_buttons.add(change_calibration_time_button)
 
 running = True
 inital_time = time.time()
@@ -795,6 +797,8 @@ wait_time = 10
 observation_output_data_file_name = None
 observation_image_plot_name = None
 observation_csv_file_name = None
+calibration_dat_file_name = None 
+temp_calibration_dat_file_name = None
 
 manual_alt_az_text_state = False
 manual_alt_az_user_input = " "
@@ -808,6 +812,10 @@ manual_ra_dec_text_state = False
 manual_ra_dec_user_input = " "
 manual_ra_dec_user_input_parsed = " "
 
+calibration_duration_text_state = False
+calibration_duration_input = " "
+calibration_duration_input_parsed = " "
+
 display_clock = None
 display_location = None
 display_coordinates_1 = None
@@ -816,6 +824,8 @@ display_round = 2
 
 width_constant = -260
 display_value_x_location = screen_width / 2 + width_constant
+
+calibration_duration = 10 # I already defined this varabile at the start of the script so this is here so I can know what is going on
 
 screen.fill(main_screen_color)
 pygame.display.flip()
@@ -839,8 +849,11 @@ while running:
             temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
             temp_state_3 = Button.doer_button_click(run_observation_button, pygame.mouse.get_pos())
             temp_state_4 = Button.doer_button_click(plot_just_finished_observation_button, pygame.mouse.get_pos())
+            temp_state_6 = Button.doer_button_click(begin_calibration_button, pygame.mouse.get_pos())
             click_state_2 = Button.on_or_off_button_click(change_observation_time_button, pygame.mouse.get_pos())
             click_state_3 = Button.on_or_off_button_click(manual_ra_dec_button, pygame.mouse.get_pos())
+            click_state_4 = Button.on_or_off_button_click(change_calibration_time_button, pygame.mouse.get_pos())
+
 
             # This handles the manual alt and az input from the user
             if manual_alt_az_button.state == True and click_state_1 == True:
@@ -858,6 +871,12 @@ while running:
             else:
                 manual_ra_dec_text_state = False
 
+            if change_calibration_time_button.state and click_state_4:
+                calibration_duration_text_state = True
+            else:
+                calibration_duration_text_state = False
+
+
             # Displays a map of the hydrogen line strength and a dot to show where the antenna is pointed at
             if temp_state_1 == True:
                 virgo.map_hi(default_observation_coordinates['right ascension'],
@@ -874,13 +893,13 @@ while running:
                     print("The angle sensor is connected!")
 
 
-            # Button that tries to run the obseravtion
+            # Button that runs an obseravtion
             if temp_state_3 == True:
                 final_observing_values['loc'] = f"{default_location_parameters['lat']} {default_location_parameters['lon']} {default_location_parameters['height']}"
                 final_observing_values['ra_dec'] = f"{default_observation_coordinates['right ascension']} {default_observation_coordinates['declination']}"
                 final_observing_values['az_alt'] = f"{default_observation_coordinates['azimuth']} {default_observation_coordinates['altitude']}"
 
-                observation_output_data_file_name, observation_image_plot_name, observation_csv_file_name = output_file_name_assigner_function()
+                observation_output_data_file_name, observation_image_plot_name, observation_csv_file_name, temp_calibration_dat_file_name = output_file_name_creator()
 
                 print("Raw data file name:", observation_output_data_file_name)
 
@@ -891,42 +910,72 @@ while running:
                 try:
                     virgo.observe(final_observing_values, spectrometer= 'wola', obs_file= observation_output_data_file_name,
                                   start_in=observation_start_time)
-                    print("Observation is complete!")
-                except ModuleNotFoundError as error:
+                    print("Observation complete!")
+                except ModuleNotFoundError as error_:
                     print("Check if the SDR is connected")
-                    print(error)
+                    print(error_)
 
                 # Removes the offset so it is not saved
                 final_observing_values['duration'] -= observation_time_offset
+
+
+             # Button that runs an obseravtion for a calibration file
+            if temp_state_6 == True:
+                final_observing_values['loc'] = f"{default_location_parameters['lat']} {default_location_parameters['lon']} {default_location_parameters['height']}"
+                final_observing_values['ra_dec'] = f"{default_observation_coordinates['right ascension']} {default_observation_coordinates['declination']}"
+                final_observing_values['az_alt'] = f"{default_observation_coordinates['azimuth']} {default_observation_coordinates['altitude']}"
+
+                #Changed the 'duration' to the calibration so the name creator can work properly
+                temp_real_observation_time = final_observing_values['duration']
+                final_observing_values['duration'] = calibration_duration
+                
+                observation_output_data_file_name, observation_image_plot_name, observation_csv_file_name, calibration_dat_file_name = output_file_name_creator()
+
+                print("Calibration file name:", calibration_dat_file_name)
+                print(f"{final_observing_values['duration'] = }")
+
+        
+                final_observing_values['duration'] += observation_time_offset
+                
+                try: 
+                    virgo.observe(final_observing_values, spectrometer= 'wola', obs_file= calibration_dat_file_name,
+                                  start_in=observation_start_time)
+                    print("Calibration observation complete!")
+                except ModuleNotFoundError as error_:
+                    print("Check if the SDR is connected")
+                    print(error_)
+
+                final_observing_values['duration'] = temp_real_observation_time
+
+                print(f"{final_observing_values['duration'] = }")
+
 
 
             # Button that plots the most resent data while the script was open
             if temp_state_4 == True:
                 try:
                     virgo.plot(obs_parameters=final_observing_values, n=30, m=35, f_rest=hydrogen_line_freq,
-                               obs_file= observation_output_data_file_name, dB=True, cal_file= "calibration.dat",
+                               obs_file= observation_output_data_file_name, dB=True, cal_file= calibration_dat_file_name,
                                spectra_csv=observation_csv_file_name, power_csv="MY time series.csv", plot_file=observation_image_plot_name)
-                    
                     
                     general_data_folder_sort_function(data_folder_name, observation_image_plot_name, observation_csv_file_name, observation_output_data_file_name)
 
                 except Exception as error:
-                    print("Propably no observation has been done yet.", error)
+                    print("Probably no observation and/or calibration has been done yet. ", error)
 
-
-
+           
             if temp_state_5 == True:
                 print("There is no code here yet.")
 
 
-        # Text input for the alt and az and conversion to ra and dec, I need to add galatic cordinates
+        # Text input for the alt and az and conversion to ra and dec
         if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
 
             if event.key == pygame.K_RETURN:
-                print("Varibles set!")
+                print("Alt, az, ra and dec set.")
+
                 manual_alt_az_user_input_parsed = user_change_az_alt_list_parse(manual_alt_az_user_input)
                 user_change_az_alt_parse(manual_alt_az_user_input_parsed)
-
                 equatorial_to_galactic()
 
             elif event.key == pygame.K_BACKSPACE:
@@ -938,12 +987,12 @@ while running:
             print(manual_alt_az_user_input)
 
 
-        # Text input for observation time
+        # Input to change the observation duration
         elif event.type == pygame.KEYDOWN and observation_time_text_state == True:
 
             if event.key == pygame.K_RETURN:
-                print("Varibles set!")
-                user_change_and_parse_observation_time(observation_time_input)
+                print("Observation duration set.")
+                final_observing_values["duration"] = user_change_and_parse_observation_time(observation_time_input)
 
             elif event.key == pygame.K_BACKSPACE:
                 observation_time_input = observation_time_input[:-1]
@@ -953,11 +1002,28 @@ while running:
 
             print(observation_time_input)
 
+        
+        # Input to change the calibration duration 
+        elif event.type == pygame.KEYDOWN and calibration_duration_text_state == True:
+
+            if event.key == pygame.K_RETURN:
+                print("Calibration duration set.")
+                calibration_duration = user_change_and_parse_observation_time(calibration_duration_input)
+
+            elif event.key == pygame.K_BACKSPACE:
+                calibration_duration_input = calibration_duration_input[:-1]
+
+            else:
+                calibration_duration_input += event.unicode
+
+            print(calibration_duration_input)
+
+        
         # Input to manually change the ra and dec, it does not go back and calculate what the alt and az should be though
         elif event.type == pygame.KEYDOWN and manual_ra_dec_text_state == True:
 
             if event.key == pygame.K_RETURN:
-                print("Variables set!")
+                print("Ra and dec set.")
                 manual_ra_dec_user_input_parsed = user_update_ra_and_dec_list_parse(manual_ra_dec_user_input)
                 user_update_ra_and_dec(manual_ra_dec_user_input_parsed)
 
@@ -993,21 +1059,27 @@ while running:
 
     draw_txt(screen, f"Observation Time: {final_observing_values['duration']}(s)", 20,
              basic_text_color, display_value_x_location, screen_height / 2 - 60)
+    draw_txt(screen, f"Calibration Time: {calibration_duration}(s)", 20,
+             basic_text_color, display_value_x_location, screen_height / 2 - 30)
     draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color,
-             display_value_x_location, screen_height / 2 - 30)
+             display_value_x_location, screen_height / 2)
 
     if manual_alt_az_button.state == True:
-        draw_txt(screen, f"like: az,alt {manual_alt_az_user_input}", 19, basic_text_color,
+        draw_txt(screen, f"Like: az,alt {manual_alt_az_user_input}", 19, basic_text_color,
                  manual_alt_az_button.x_position, manual_alt_az_button.y_position + 50)
 
     if change_observation_time_button.state == True:
-        draw_txt(screen, f"like: time {observation_time_input}", 19, basic_text_color,
+        draw_txt(screen, f"Like: time {observation_time_input}", 19, basic_text_color,
                  change_observation_time_button.x_position, change_observation_time_button.y_position + 50)
+    
+    if change_calibration_time_button.state:
+        draw_txt(screen, f"Like: time {calibration_duration_input}", 19, basic_text_color,change_calibration_time_button.x_position, change_calibration_time_button.y_position + 50 )
 
     if manual_ra_dec_button.state == True:
-        draw_txt(screen, f"like: ra,dec {manual_ra_dec_user_input}", 19, basic_text_color,
+        draw_txt(screen, f"Like: ra,dec {manual_ra_dec_user_input}", 19, basic_text_color,
                  manual_ra_dec_button.x_position, manual_ra_dec_button.y_position + 50)
 
     end_of_game_loop_button_render(screen, screen_2_buttons)
 
     pygame.display.flip()
+    ##
