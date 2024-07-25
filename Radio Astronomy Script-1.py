@@ -925,15 +925,18 @@ while running:
                 final_observing_values['ra_dec'] = f"{default_observation_coordinates['right ascension']} {default_observation_coordinates['declination']}"
                 final_observing_values['az_alt'] = f"{default_observation_coordinates['azimuth']} {default_observation_coordinates['altitude']}"
 
+                #Changed the 'duration' to the calibration so the name creator can work properly
+                temp_real_observation_time = final_observing_values['duration']
+                final_observing_values['duration'] = calibration_duration
+                
                 observation_output_data_file_name, observation_image_plot_name, observation_csv_file_name, calibration_dat_file_name = output_file_name_creator()
 
                 print("Calibration file name:", calibration_dat_file_name)
-
-                temp_real_observation_time = final_observing_values['duration']
-                final_observing_values['duration'] = calibration_duration + observation_time_offset
                 print(f"{final_observing_values['duration'] = }")
 
-
+        
+                final_observing_values['duration'] += observation_time_offset
+                
                 try: 
                     virgo.observe(final_observing_values, spectrometer= 'wola', obs_file= calibration_dat_file_name,
                                   start_in=observation_start_time)
