@@ -81,7 +81,7 @@ default_location_parameters = {
 }
 
 ### Data organizing varbiles
-data_folder_name = "Observation Data"
+general_data_folder_name = "Observation Data"
 
 ### Phidget spatial sensor attachment time
 attachment_time = 5 * 1000
@@ -264,7 +264,8 @@ def output_file_name_creator() -> dict:
     raw_data_file_name = f"HI Data; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).dat"
     calibration_file_name= f"HI Calibration; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).dat"
     plotted_data_file_name = f"HI Plot; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).png"
-    spectra_csv_file_name = f"HI CSV; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).csv"
+    spectra_csv_file_name = f"HI Spectra; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).csv"
+    power_csv_file_name = f"HI Power; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).csv"
     hydrogen_map_file_name = f"HI Map; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).png"
     raw_data_file_header_name = f"HI Data; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).header"
     calibration_file_header_name = f"HI Calibration; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).header"
@@ -272,6 +273,7 @@ def output_file_name_creator() -> dict:
     name_dict = {'raw data': raw_data_file_name, 
                  'plotted data figure': plotted_data_file_name, 
                  'spectra csv': spectra_csv_file_name, 
+                 'power csv': power_csv_file_name,
                  'calibration file': calibration_file_name,
                  'HI map': hydrogen_map_file_name,
                  'raw data header': raw_data_file_header_name,
@@ -279,7 +281,7 @@ def output_file_name_creator() -> dict:
 
     return name_dict
 
-def output_data_folder_name_assigner() -> str:
+def daily_observation_folder_name_creator() -> str:
     time_tuple = time.localtime()
 
     year = time_tuple.tm_year
@@ -619,7 +621,7 @@ def create_subfolder(subfolder_name, top_level_folder = None, subfolder_location
         return folder_path
     
     else:
-        print("A subfolder could not have been created")
+        print("A subfolder could not be created.")
     
 
 # Used to create lots of subfoloers in a folder
@@ -635,39 +637,71 @@ def create_subfolders(top_level_folder, subfolder_names) -> None:
         except FileExistsError:
             print(f"{folder_path} is a path that already exists.")
 
+#### Silly function comeback 
+def general_data_sorter_function(top_level_data_folder, observation_data = None, observation_header = None, calibration = None, 
+                                      calibration_header = None, spectra_csv = None, power_csv = None, data_plot = None, hydrogen_map = None) -> None:
+    # Move all the created files to where they should be (which dated folder and if it is a picture or a csv/list)
+    # If a csv/list then move to "raw data" else do nothing just keep it in the dated folder
+    # Move all files made on the same day to the folder for that date
+    # Check for duplicate folders and create a folder for a new date if need be (use try and except statements)
+    observation_folder_name = "Observations"
+    calibration_folder_name = "Calibrations"
+    csv_output_folder_name = "CSV Outputs"
+    daily_observation_folder_name = daily_observation_folder_name_creator() # Just generates the name of the daily folder
+    daily_observation_folder_path = create_subfolder(daily_observation_folder_name, top_level_folder = top_level_data_folder) # Creates the daily folder
 
-
-
-def general_data_folder_sort_function(top_level_data_folder, file_name_dict = None plot_image_name = None, spectra_csv_file_name = None, raw_data_file_name = None, 
-                                      hydrogen_map_name,calibration_file_name = None, raw_data_header_file_name = None, calibration_header_file_name = None) -> None:
-    #Move all the created files to where they should be (which dated folder and if it is a picture or a csv/list)
-    #If a csv/list then move to "raw data" else do nothing just keep it in the dated folder
-    #Move all files made on the same day to the folder for that date
-    #Check for duplicate folders and create a folder for a new date if need be (use try and except statements)
-    raw_data_folder_name ="Raw Data"
-    source_picture_path = f"./{plot_image_name}"
-    source_csv_path = f"./{spectra_csv_file_name}"
-    source_dat_path = f"./{raw_data_file_name}"
-
-    daily_observation_folder_name = output_data_folder_name_assigner()
 
     # Remember, because the name of the folder only has the date -- and not the time -- this functionality works, but if it had the time then 
     # I would need more code to make sure it only creates a new folder everyday so it can be sorted by day
 
-    daily_observation_folder_path = create_subfolder(daily_observation_folder_name, top_level_folder = top_level_data_folder)
-    print(f"{daily_observation_folder_path = }")
+    if observation_data is not None: 
+         sub_folder_path = create_subfolder(observation_folder_name, subfolder_location_path = daily_observation_folder_path)
+         source_path = f"./{observation_data}"
+         destination_path = f"{sub_folder_path}/{observation_data}"
+         shutil.move(source_path, destination_path)
+
+    elif observation_header is not None:
+        sub_folder_path = create_subfolder(observation_folder_name, subfolder_location_path = daily_observation_folder_path)
+        source_path = f"./{observation_header}"
+        destination_path = f"{sub_folder_path}/{observation_header}"
+        shutil.move(source_path, destination_path)
+
+    elif calibration is not None:
+        sub_folder_path = create_subfolder(calibration_folder_name, subfolder_location_path = daily_observation_folder_path)
+        source_path = f"./{calibration}"
+        destination_path = f"{sub_folder_path}/{calibration}"
+        shutil.move(source_path, destination_path)
     
-    raw_data_folder_path = create_subfolder(raw_data_folder_name, subfolder_location_path = daily_observation_folder_path)
+    elif calibration_header is not None:
+        sub_folder_path = create_subfolder(calibration_folder_name, subfolder_location_path = daily_observation_folder_path)
+        source_path = f"./{calibration_header}"
+        destination_path = f"{sub_folder_path}/{calibration_header}"
+        shutil.move(source_path, destination_path)
 
-    destination_picture_path = f"{daily_observation_folder_path}/{plot_image_name}"
-    destination_csv_path = f"{raw_data_folder_path}/{spectra_csv_file_name}"
-    destination_dat_path = f"{raw_data_folder_path}/{raw_data_file_name}"
+    elif spectra_csv is not None:
+        sub_folder_path = create_subfolder(csv_output_folder_name, subfolder_location_path = daily_observation_folder_path)
+        source_path = f"./{spectra_csv}"
+        destination_path = f"{sub_folder_path}/{spectra_csv}"
+        shutil.move(source_path, destination_path)
 
-    shutil.move(source_picture_path, destination_picture_path)
-    shutil.move(source_csv_path, destination_csv_path)
-    shutil.move(source_dat_path, destination_dat_path)
+    elif power_csv is not None: 
+        sub_folder_path = create_subfolder(csv_output_folder_name, subfolder_location_path = daily_observation_folder_path)
+        source_path = f"./{power_csv}"
+        destination_path = f"{sub_folder_path}/{power_csv}"
+        shutil.move(source_path, destination_path)
 
+    elif data_plot is not None: 
+        source_path = f"./{data_plot}"
+        destination_path = f"{daily_observation_folder_path}/{data_plot}"
+        shutil.move(source_path, destination_path)
 
+    elif hydrogen_map is not None: 
+        source_path = f"./{hydrogen_map}"
+        destination_path = f"{daily_observation_folder_path}/{hydrogen_map}"
+        shutil.move(source_path, destination_path)
+    
+    else:
+        print("No files were moved.")
 
 # Mr.V's on screen text drawing function. It is really helpful!
 def draw_txt(surf, text, size, color, x, y):
@@ -679,7 +713,7 @@ def draw_txt(surf, text, size, color, x, y):
 
 
 ### Creating/ checking for folders ###
-create_one_folder(data_folder_name)
+create_one_folder(general_data_folder_name)
 
 ### First game loop for the starting screen ###
 # color_button = Button("Night Mode", screen_width/2, screen_height/2)
@@ -808,12 +842,14 @@ wait_time = 10
 # I might want to combine all these functions into one just for ease of coding
 observation_output_data_file_name = None
 observation_image_plot_name = None
-observation_csv_file_name = None
+observation_spectra_output_csv = None
+observation_power_vs_time_output_csv = None
 calibration_raw_data_file_name = None 
 temp_calibration_raw_data_file_name = None
-file_name_dict = None
 observation_output_data_header_file_name = None
 calibration_dat_file_header_name = None
+file_name_dict = None
+temp_file_name_dict = None
 
 manual_alt_az_text_state = False
 manual_alt_az_user_input = " "
@@ -894,10 +930,10 @@ while running:
 
             # Displays a map of the hydrogen line strength and a dot to show where the antenna is pointed at
             if temp_state_1 == True:
-                file_name_dict = output_file_name_creator()
+                temp_file_name_dict = output_file_name_creator()
                 try:
                     virgo.map_hi(default_observation_coordinates['right ascension'],
-                                default_observation_coordinates['declination'], plot_file= file_name_dict['HI map'])
+                                default_observation_coordinates['declination'], plot_file= temp_file_name_dict['HI map'])
                 except Exception as error_:
                     print("Creating a map of the hydrogen line signal strength was unsuccessful. ", error_)
 
@@ -913,38 +949,7 @@ while running:
                     print("The angle sensor is connected!")
 
 
-            # Button that runs an obseravtion
-            if temp_state_3 == True:
-                final_observing_values['loc'] = f"{default_location_parameters['lat']} {default_location_parameters['lon']} {default_location_parameters['height']}"
-                final_observing_values['ra_dec'] = f"{default_observation_coordinates['right ascension']} {default_observation_coordinates['declination']}"
-                final_observing_values['az_alt'] = f"{default_observation_coordinates['azimuth']} {default_observation_coordinates['altitude']}"
-
-                file_name_dict = output_file_name_creator()
-                observation_output_data_file_name = file_name_dict['raw data']
-                observation_image_plot_name = file_name_dict['plotted data figure']
-                observation_csv_file_name = file_name_dict['spectra csv']
-                observation_output_data_header_file_name = file_name_dict['raw data header']
-
-
-                print("Raw data file name:", observation_output_data_file_name)
-
-                # Adds the offset only here because in all other uses the offset is not needed
-                final_observing_values['duration'] += observation_time_offset
-
-                # Runs the observation
-                try:
-                    virgo.observe(final_observing_values, spectrometer= 'wola', obs_file= observation_output_data_file_name,
-                                  start_in=observation_start_time)
-                    print("Observation complete!")
-                except ModuleNotFoundError as error_:
-                    print("Check if the SDR is connected")
-                    print(error_)
-
-                # Removes the offset so it is not saved
-                final_observing_values['duration'] -= observation_time_offset
-
-
-             # Button that runs an obseravtion for a calibration file
+            # Button that runs an obseravtion for a calibration file
             if temp_state_6 == True:
                 final_observing_values['loc'] = f"{default_location_parameters['lat']} {default_location_parameters['lon']} {default_location_parameters['height']}"
                 final_observing_values['ra_dec'] = f"{default_observation_coordinates['right ascension']} {default_observation_coordinates['declination']}"
@@ -976,14 +981,49 @@ while running:
 
                 print(f"{final_observing_values['duration'] = }")
 
+
+            # Button that runs an obseravtion
+            if temp_state_3 == True:
+                final_observing_values['loc'] = f"{default_location_parameters['lat']} {default_location_parameters['lon']} {default_location_parameters['height']}"
+                final_observing_values['ra_dec'] = f"{default_observation_coordinates['right ascension']} {default_observation_coordinates['declination']}"
+                final_observing_values['az_alt'] = f"{default_observation_coordinates['azimuth']} {default_observation_coordinates['altitude']}"
+
+                file_name_dict = output_file_name_creator()
+                observation_output_data_file_name = file_name_dict['raw data']
+                observation_output_data_header_file_name = file_name_dict['raw data header']
+                observation_spectra_output_csv = file_name_dict['spectra csv']
+                observation_power_vs_time_output_csv = file_name_dict['power csv']
+                observation_image_plot_name = file_name_dict['plotted data figure']
+
+                print("Raw data file name:", observation_output_data_file_name)
+
+                # Adds the offset only here because in all other uses the offset is not needed
+                final_observing_values['duration'] += observation_time_offset
+
+                # Runs the observation
+                try:
+                    virgo.observe(final_observing_values, spectrometer= 'wola', obs_file= observation_output_data_file_name,
+                                  start_in=observation_start_time)
+                    print("Observation complete!")
+                except ModuleNotFoundError as error_:
+                    print("Check if the SDR is connected")
+                    print(error_)
+
+                # Removes the offset so it is not saved
+                final_observing_values['duration'] -= observation_time_offset
+
+
             # Button that plots the most resent data while the script was open
             if temp_state_4 == True:
                 try:
                     virgo.plot(obs_parameters=final_observing_values, n=30, m=35, f_rest=hydrogen_line_freq,
                                obs_file= observation_output_data_file_name, dB=True, cal_file= calibration_raw_data_file_name,
-                               spectra_csv=observation_csv_file_name, power_csv="MY time series.csv", plot_file=observation_image_plot_name)
+                               spectra_csv=observation_spectra_output_csv, power_csv=observation_power_vs_time_output_csv, plot_file=observation_image_plot_name)
                     
-                    general_data_folder_sort_function(data_folder_name, observation_image_plot_name, observation_csv_file_name, observation_output_data_file_name)
+                    general_data_sorter_function(general_data_folder_name, observation_data=observation_output_data_file_name, 
+                                                 observation_header = observation_output_data_header_file_name, calibration = calibration_raw_data_file_name, 
+                                                 calibration_header= calibration_dat_file_header_name, spectra_csv = observation_spectra_output_csv, 
+                                                 power_csv = observation_power_vs_time_output_csv, data_plot = observation_image_plot_name)
 
                 except Exception as error:
                     print("Probably no observation and/or calibration has been done yet. ", error)
