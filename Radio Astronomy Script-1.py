@@ -933,7 +933,8 @@ while running:
                 temp_file_name_dict = output_file_name_creator()
                 try:
                     virgo.map_hi(default_observation_coordinates['right ascension'],
-                                default_observation_coordinates['declination'], plot_file= temp_file_name_dict['HI map'])
+                                default_observation_coordinates['declination'], plot_file = temp_file_name_dict['HI map'])
+                    general_data_sorter_function(general_data_folder_name, hydrogen_map = temp_file_name_dict['HI map'])
                 except Exception as error_:
                     print("Creating a map of the hydrogen line signal strength was unsuccessful. ", error_)
 
