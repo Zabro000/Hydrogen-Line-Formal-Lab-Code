@@ -266,12 +266,16 @@ def output_file_name_creator() -> dict:
     plotted_data_file_name = f"HI Plot; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).png"
     spectra_csv_file_name = f"HI CSV; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).csv"
     hydrogen_map_file_name = f"HI Map; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).png"
+    raw_data_file_header_name = f"HI Data; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).header"
+    calibration_file_header_name = f"HI Calibration; {year} day {year_day} or {year}-{month}-{normal_day} {hour};{minute}, duration; {obs_time}(s), Gain; {sdr_gain}(dB), ra and dec; {ra}(hr), {dec}(deg).header"
 
     name_dict = {'raw data': raw_data_file_name, 
                  'plotted data figure': plotted_data_file_name, 
                  'spectra csv': spectra_csv_file_name, 
                  'calibration file': calibration_file_name,
-                 'HI map': hydrogen_map_file_name}
+                 'HI map': hydrogen_map_file_name,
+                 'raw data header': raw_data_file_header_name,
+                 'calibration file header': calibration_file_header_name}
 
     return name_dict
 
@@ -634,15 +638,16 @@ def create_subfolders(top_level_folder, subfolder_names) -> None:
 
 
 
-def general_data_folder_sort_function(top_level_data_folder, picture_name, csv_name, dat_file_name) -> None:
+def general_data_folder_sort_function(top_level_data_folder, file_name_dict = None plot_image_name = None, spectra_csv_file_name = None, raw_data_file_name = None, 
+                                      hydrogen_map_name,calibration_file_name = None, raw_data_header_file_name = None, calibration_header_file_name = None) -> None:
     #Move all the created files to where they should be (which dated folder and if it is a picture or a csv/list)
     #If a csv/list then move to "raw data" else do nothing just keep it in the dated folder
     #Move all files made on the same day to the folder for that date
     #Check for duplicate folders and create a folder for a new date if need be (use try and except statements)
     raw_data_folder_name ="Raw Data"
-    source_picture_path = f"./{picture_name}"
-    source_csv_path = f"./{csv_name}"
-    source_dat_path = f"./{dat_file_name}"
+    source_picture_path = f"./{plot_image_name}"
+    source_csv_path = f"./{spectra_csv_file_name}"
+    source_dat_path = f"./{raw_data_file_name}"
 
     daily_observation_folder_name = output_data_folder_name_assigner()
 
@@ -654,9 +659,9 @@ def general_data_folder_sort_function(top_level_data_folder, picture_name, csv_n
     
     raw_data_folder_path = create_subfolder(raw_data_folder_name, subfolder_location_path = daily_observation_folder_path)
 
-    destination_picture_path = f"{daily_observation_folder_path}/{picture_name}"
-    destination_csv_path = f"{raw_data_folder_path}/{csv_name}"
-    destination_dat_path = f"{raw_data_folder_path}/{dat_file_name}"
+    destination_picture_path = f"{daily_observation_folder_path}/{plot_image_name}"
+    destination_csv_path = f"{raw_data_folder_path}/{spectra_csv_file_name}"
+    destination_dat_path = f"{raw_data_folder_path}/{raw_data_file_name}"
 
     shutil.move(source_picture_path, destination_picture_path)
     shutil.move(source_csv_path, destination_csv_path)
@@ -804,9 +809,11 @@ wait_time = 10
 observation_output_data_file_name = None
 observation_image_plot_name = None
 observation_csv_file_name = None
-calibration_dat_file_name = None 
-temp_calibration_dat_file_name = None
+calibration_raw_data_file_name = None 
+temp_calibration_raw_data_file_name = None
 file_name_dict = None
+observation_output_data_header_file_name = None
+calibration_dat_file_header_name = None
 
 manual_alt_az_text_state = False
 manual_alt_az_user_input = " "
@@ -916,6 +923,7 @@ while running:
                 observation_output_data_file_name = file_name_dict['raw data']
                 observation_image_plot_name = file_name_dict['plotted data figure']
                 observation_csv_file_name = file_name_dict['spectra csv']
+                observation_output_data_header_file_name = file_name_dict['raw data header']
 
 
                 print("Raw data file name:", observation_output_data_file_name)
@@ -947,16 +955,17 @@ while running:
                 final_observing_values['duration'] = calibration_duration
                 
                 file_name_dict = output_file_name_creator()
-                calibration_dat_file_name = file_name_dict['calibration file']
+                calibration_raw_data_file_name = file_name_dict['calibration file']
+                calibration_dat_file_header_name = file_name_dict['calibration file header']
 
-                print("Calibration file name:", calibration_dat_file_name)
+                print("Calibration file name:", calibration_raw_data_file_name)
                 print(f"{final_observing_values['duration'] = }")
 
         
                 final_observing_values['duration'] += observation_time_offset
                 
                 try: 
-                    virgo.observe(final_observing_values, spectrometer= 'wola', obs_file= calibration_dat_file_name,
+                    virgo.observe(final_observing_values, spectrometer= 'wola', obs_file= calibration_raw_data_file_name,
                                   start_in=observation_start_time)
                     print("Calibration observation complete!")
                 except ModuleNotFoundError as error_:
@@ -967,13 +976,11 @@ while running:
 
                 print(f"{final_observing_values['duration'] = }")
 
-
-
             # Button that plots the most resent data while the script was open
             if temp_state_4 == True:
                 try:
                     virgo.plot(obs_parameters=final_observing_values, n=30, m=35, f_rest=hydrogen_line_freq,
-                               obs_file= observation_output_data_file_name, dB=True, cal_file= calibration_dat_file_name,
+                               obs_file= observation_output_data_file_name, dB=True, cal_file= calibration_raw_data_file_name,
                                spectra_csv=observation_csv_file_name, power_csv="MY time series.csv", plot_file=observation_image_plot_name)
                     
                     general_data_folder_sort_function(data_folder_name, observation_image_plot_name, observation_csv_file_name, observation_output_data_file_name)
