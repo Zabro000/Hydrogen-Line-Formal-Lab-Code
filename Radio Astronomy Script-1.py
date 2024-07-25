@@ -1153,4 +1153,3 @@ while running:
     end_of_game_loop_button_render(screen, screen_2_buttons)
 
     pygame.display.flip()
-    ##
