@@ -660,48 +660,46 @@ def general_data_sorter_function(top_level_data_folder, observation_data = None,
          destination_path = f"{sub_folder_path}/{observation_data}"
          shutil.move(source_path, destination_path)
 
-    elif observation_header is not None:
+    if observation_header is not None:
         sub_folder_path = create_subfolder(observation_folder_name, subfolder_location_path = daily_observation_folder_path)
         source_path = f"./{observation_header}"
         destination_path = f"{sub_folder_path}/{observation_header}"
         shutil.move(source_path, destination_path)
 
-    elif calibration is not None:
+    if calibration is not None:
         sub_folder_path = create_subfolder(calibration_folder_name, subfolder_location_path = daily_observation_folder_path)
         source_path = f"./{calibration}"
         destination_path = f"{sub_folder_path}/{calibration}"
         shutil.move(source_path, destination_path)
     
-    elif calibration_header is not None:
+    if calibration_header is not None:
         sub_folder_path = create_subfolder(calibration_folder_name, subfolder_location_path = daily_observation_folder_path)
         source_path = f"./{calibration_header}"
         destination_path = f"{sub_folder_path}/{calibration_header}"
         shutil.move(source_path, destination_path)
 
-    elif spectra_csv is not None:
+    if spectra_csv is not None:
         sub_folder_path = create_subfolder(csv_output_folder_name, subfolder_location_path = daily_observation_folder_path)
         source_path = f"./{spectra_csv}"
         destination_path = f"{sub_folder_path}/{spectra_csv}"
         shutil.move(source_path, destination_path)
 
-    elif power_csv is not None: 
+    if power_csv is not None: 
         sub_folder_path = create_subfolder(csv_output_folder_name, subfolder_location_path = daily_observation_folder_path)
         source_path = f"./{power_csv}"
         destination_path = f"{sub_folder_path}/{power_csv}"
         shutil.move(source_path, destination_path)
 
-    elif data_plot is not None: 
+    if data_plot is not None: 
         source_path = f"./{data_plot}"
         destination_path = f"{daily_observation_folder_path}/{data_plot}"
         shutil.move(source_path, destination_path)
 
-    elif hydrogen_map is not None: 
+    if hydrogen_map is not None: 
         source_path = f"./{hydrogen_map}"
         destination_path = f"{daily_observation_folder_path}/{hydrogen_map}"
         shutil.move(source_path, destination_path)
-    
-    else:
-        print("No files were moved.")
+
 
 # Mr.V's on screen text drawing function. It is really helpful!
 def draw_txt(surf, text, size, color, x, y):
