@@ -812,7 +812,7 @@ run_observation_button = Button("Begin Observation", screen_width / 2 + 600, scr
 manual_ra_dec_button = Button("Manual Ra/Dec", screen_width / 2 - 300, screen_height / 2 + 100)
 change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 300, screen_height / 2 + 300, button_text_size= 17)
 change_calibration_time_button = Button("Change Calibration Time", screen_width / 2 - 0, screen_height / 2 + 300, button_text_size= 17)
-sort_calibration_files_button = Button("Sort Cal Files", screen_width / 2 + 540, screen_height / 2 + 185, button_width = 80, button_height = 50, button_text_size = 14)
+sort_calibration_files_button = Button("Sort Cal Files", screen_width / 2 + 540, screen_height / 2 + 185, button_width = 85, button_height = 50, button_text_size = 13)
 plot_just_finished_observation_button = Button("Plot Data", screen_width / 2 + 600, screen_height / 2 + 100)
 begin_calibration_button = Button("Begin Calibration",screen_width / 2 + 600, screen_height / 2 - 300)
 
@@ -825,7 +825,7 @@ screen_2_buttons.add(run_observation_button)
 screen_2_buttons.add(change_observation_time_button)
 screen_2_buttons.add(plot_just_finished_observation_button)
 screen_2_buttons.add(manual_ra_dec_button)
-screen_2_buttons.add(sort_calibration_files)
+screen_2_buttons.add(sort_calibration_files_button)
 screen_2_buttons.add(begin_calibration_button)
 screen_2_buttons.add(change_calibration_time_button)
 
