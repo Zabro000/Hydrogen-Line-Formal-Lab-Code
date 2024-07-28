@@ -650,7 +650,6 @@ def general_data_sorter_function(top_level_data_folder, observation_data = None,
     daily_observation_folder_name = daily_observation_folder_name_creator() # Just generates the name of the daily folder
     daily_observation_folder_path = create_subfolder(daily_observation_folder_name, top_level_folder = top_level_data_folder) # Creates the daily folder
 
-
     # Remember, because the name of the folder only has the date -- and not the time -- this functionality works, but if it had the time then 
     # I would need more code to make sure it only creates a new folder everyday so it can be sorted by day
 
@@ -744,7 +743,7 @@ while running:
             running = False
             print("Program has stopped.")
             # Raises basic error so the program will just stop
-            raise WindowsError
+            raise Exception
 
         if event.type == pygame.MOUSEBUTTONDOWN:
 
@@ -885,9 +884,9 @@ while running:
 
         if event.type == pygame.QUIT:
             running = False
-            print("Program will hult now!")
+            print("Program has stopped.")
             # raises basic error so the program will stop
-            raise WindowsError
+            raise Exception
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             click_state_1 = Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
