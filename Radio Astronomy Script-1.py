@@ -713,12 +713,10 @@ def draw_txt(surf, text, size, color, x, y):
 create_one_folder(general_data_folder_name)
 
 ### First game loop for the starting screen ###
-# color_button = Button("Night Mode", screen_width/2, screen_height/2)
 continue_button = Button("Continue", screen_width / 2, screen_height / 2)
 location_settings_button = Button("Change Location", screen_width / 2 - 300, screen_height / 2)
 
 screen_1_buttons = pygame.sprite.Group()
-# screen_1_buttons.add(color_button)
 screen_1_buttons.add(continue_button)
 screen_1_buttons.add(location_settings_button)
 
@@ -805,21 +803,24 @@ while running:
 ### Second loop for getting the observation ready, the functions for the user input is the same so there are only comments on the new bits
 manual_alt_az_button = Button("Manual Alt/Az", screen_width / 2 - 600, screen_height / 2 - 300)
 auto_alt_az_button = Button("Auto Alt Az", screen_width / 2 - 600, screen_height / 2 + 100)
-hi_display_button = Button("Create Hydrogen Map", screen_width / 2 - 600, screen_height / 2 + 300)
+hi_display_button = Button("Create Hydrogen Map", screen_width / 2 - 600, screen_height / 2 + 100)
 test_spatial_phidget_button = Button("Test Phidget", screen_width / 2 - 600, screen_height / 2 - 100)
 run_observation_button = Button("Begin Observation", screen_width / 2 + 600, screen_height / 2 - 100)
-manual_ra_dec_button = Button("Manual Ra/Dec", screen_width / 2 - 300, screen_height / 2 + 100)
-change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 300, screen_height / 2 + 300, button_text_size= 17)
-change_calibration_time_button = Button("Change Calibration Time", screen_width / 2 - 0, screen_height / 2 + 300, button_text_size= 17)
+manual_ra_dec_button = Button("Manual Ra/Dec", screen_width / 2 - 600, screen_height / 2 - 100)
+change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 0, screen_height / 2 + 100, button_text_size= 17)
+change_calibration_time_button = Button("Change Calibration Time", screen_width / 2 - 300, screen_height / 2 + 100, button_text_size= 17)
 sort_calibration_files_button = Button("Sort Cal Files", screen_width / 2 + 540, screen_height / 2 + 185, button_width = 85, button_height = 50, button_text_size = 13)
 plot_just_finished_observation_button = Button("Plot Data", screen_width / 2 + 600, screen_height / 2 + 100)
 begin_calibration_button = Button("Begin Calibration",screen_width / 2 + 600, screen_height / 2 - 300)
 
+import_calibration_file_button = Button("Import Observation", screen_width / 2 - 0, screen_height / 2 + 300, button_text_size = 17)
+import_obervation_file_button = Button("Import Calibration", screen_width / 2 - 300, screen_height / 2 + 300, button_text_size = 17 )
+
 screen_2_buttons = pygame.sprite.Group()
 screen_2_buttons.add(manual_alt_az_button)
-screen_2_buttons.add(auto_alt_az_button)
+#screen_2_buttons.add(auto_alt_az_button)
 screen_2_buttons.add(hi_display_button)
-screen_2_buttons.add(test_spatial_phidget_button)
+# screen_2_buttons.add(test_spatial_phidget_button)
 screen_2_buttons.add(run_observation_button)
 screen_2_buttons.add(change_observation_time_button)
 screen_2_buttons.add(plot_just_finished_observation_button)
@@ -827,6 +828,10 @@ screen_2_buttons.add(manual_ra_dec_button)
 screen_2_buttons.add(sort_calibration_files_button)
 screen_2_buttons.add(begin_calibration_button)
 screen_2_buttons.add(change_calibration_time_button)
+
+screen_2_buttons.add(import_calibration_file_button)
+screen_2_buttons.add(import_obervation_file_button)
+
 
 running = True
 inital_time = time.time()
@@ -890,9 +895,7 @@ while running:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             click_state_1 = Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
-            temp_state_5 = Button.doer_button_click(auto_alt_az_button, pygame.mouse.get_pos())
             temp_state_1 = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
-            temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
             temp_state_3 = Button.doer_button_click(run_observation_button, pygame.mouse.get_pos())
             temp_state_4 = Button.doer_button_click(plot_just_finished_observation_button, pygame.mouse.get_pos())
             temp_state_6 = Button.doer_button_click(begin_calibration_button, pygame.mouse.get_pos())
@@ -933,18 +936,6 @@ while running:
                     general_data_sorter_function(general_data_folder_name, hydrogen_map = temp_file_name_dict['HI map'])
                 except Exception as error_:
                     print("Creating a map of the hydrogen line signal strength was unsuccessful. ", error_)
-
-
-            # Tries to initalize the angle phidget sensor
-            if temp_state_2 == True:
-                angle_sensor = Spatial()
-                try:
-                    angle_sensor.openWaitForAttachment(attachment_time)
-                except PhidgetException as error:
-                    print("The phidget is probably not attached, ", error)
-                else:
-                    print("The angle sensor is connected!")
-
 
             # Lets the user sort and store the calibration files when they are done with them
             if temp_state_7 is True:
@@ -1034,9 +1025,6 @@ while running:
                 except Exception as error:
                     print("Probably no observation and/or calibration has been done yet. ", error)
 
-           
-            if temp_state_5 == True:
-                print("There is no code here yet.")
 
 
         # Text input for the alt and az and conversion to ra and dec
