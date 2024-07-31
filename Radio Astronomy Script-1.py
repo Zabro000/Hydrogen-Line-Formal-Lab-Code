@@ -583,6 +583,35 @@ def equatorial_to_galactic() -> None:
           default_observation_coordinates['galactic longitude and latitude list'])
     
 
+def parse_imported_calibration_file(file_date, file_time) -> str:
+    stripped_date = file_date.strip()
+    stripped_time = file_time.strip()
+
+    
+
+
+
+
+    ...
+
+def parse_imported_observation_file(file_date, file_time) -> str:
+    ...
+
+
+
+# Function that finds the first file given the name of the file and the folder to look in
+def find_first_file(file_name, base_folder) -> None:
+
+    for current_folder, sub_folders, files in os.walk(base_folder):
+        if file_name in files:
+            print("Found the file")
+    
+
+
+
+
+def import_file() -> None:
+    ...
     
 # Used to create a folder in the root directory
 def create_one_folder(folder_name) -> None:
@@ -802,9 +831,7 @@ while running:
 
 ### Second loop for getting the observation ready, the functions for the user input is the same so there are only comments on the new bits
 manual_alt_az_button = Button("Manual Alt/Az", screen_width / 2 - 600, screen_height / 2 - 300)
-auto_alt_az_button = Button("Auto Alt Az", screen_width / 2 - 600, screen_height / 2 + 100)
 hi_display_button = Button("Create Hydrogen Map", screen_width / 2 - 600, screen_height / 2 + 100)
-test_spatial_phidget_button = Button("Test Phidget", screen_width / 2 - 600, screen_height / 2 - 100)
 run_observation_button = Button("Begin Observation", screen_width / 2 + 600, screen_height / 2 - 100)
 manual_ra_dec_button = Button("Manual Ra/Dec", screen_width / 2 - 600, screen_height / 2 - 100)
 change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 0, screen_height / 2 + 100, button_text_size= 17)
@@ -812,15 +839,16 @@ change_calibration_time_button = Button("Change Calibration Time", screen_width 
 sort_calibration_files_button = Button("Sort Cal Files", screen_width / 2 + 540, screen_height / 2 + 185, button_width = 85, button_height = 50, button_text_size = 13)
 plot_just_finished_observation_button = Button("Plot Data", screen_width / 2 + 600, screen_height / 2 + 100)
 begin_calibration_button = Button("Begin Calibration",screen_width / 2 + 600, screen_height / 2 - 300)
+import_calibration_file_button = Button("Import Observation File", screen_width / 2 - 0, screen_height / 2 + 300, button_text_size = 17)
+import_observation_file_button = Button("Import Calibration File", screen_width / 2 - 300, screen_height / 2 + 300, button_text_size = 17 )
 
-import_calibration_file_button = Button("Import Observation", screen_width / 2 - 0, screen_height / 2 + 300, button_text_size = 17)
-import_obervation_file_button = Button("Import Calibration", screen_width / 2 - 300, screen_height / 2 + 300, button_text_size = 17 )
+# Unused buttons
+test_spatial_phidget_button = Button("Test Phidget", screen_width / 2 - 600, screen_height / 2 - 100)
+auto_alt_az_button = Button("Auto Alt Az", screen_width / 2 - 600, screen_height / 2 + 100)
 
 screen_2_buttons = pygame.sprite.Group()
 screen_2_buttons.add(manual_alt_az_button)
-#screen_2_buttons.add(auto_alt_az_button)
 screen_2_buttons.add(hi_display_button)
-# screen_2_buttons.add(test_spatial_phidget_button)
 screen_2_buttons.add(run_observation_button)
 screen_2_buttons.add(change_observation_time_button)
 screen_2_buttons.add(plot_just_finished_observation_button)
@@ -830,7 +858,7 @@ screen_2_buttons.add(begin_calibration_button)
 screen_2_buttons.add(change_calibration_time_button)
 
 screen_2_buttons.add(import_calibration_file_button)
-screen_2_buttons.add(import_obervation_file_button)
+screen_2_buttons.add(import_observation_file_button)
 
 
 running = True
@@ -867,6 +895,14 @@ calibration_duration_text_state = False
 calibration_duration_input = " "
 calibration_duration_input_parsed = " "
 
+import_calibration_text_state = False 
+import_calibration_input = " "
+import_calibration_input_parsed = " "
+
+import_observation_text_state = False
+import_observation_input = " "
+import_observation_input_parsed = " "
+
 display_clock = None
 display_location = None
 display_coordinates_1 = None
@@ -894,15 +930,17 @@ while running:
             raise Exception
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            click_state_1 = Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
             temp_state_1 = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
             temp_state_3 = Button.doer_button_click(run_observation_button, pygame.mouse.get_pos())
             temp_state_4 = Button.doer_button_click(plot_just_finished_observation_button, pygame.mouse.get_pos())
             temp_state_6 = Button.doer_button_click(begin_calibration_button, pygame.mouse.get_pos())
             temp_state_7 = Button.doer_button_click(sort_calibration_files_button, pygame.mouse.get_pos())
+            click_state_1 = Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
             click_state_2 = Button.on_or_off_button_click(change_observation_time_button, pygame.mouse.get_pos())
             click_state_3 = Button.on_or_off_button_click(manual_ra_dec_button, pygame.mouse.get_pos())
             click_state_4 = Button.on_or_off_button_click(change_calibration_time_button, pygame.mouse.get_pos())
+            click_state_5 =  Button.on_or_off_button_click(import_calibration_file_button, pygame.mouse.get_pos())
+            click_state_6 =  Button.on_or_off_button_click(import_observation_file_button, pygame.mouse.get_pos())
 
 
             # This handles the manual alt and az input from the user
@@ -925,6 +963,16 @@ while running:
                 calibration_duration_text_state = True
             else:
                 calibration_duration_text_state = False
+
+            if import_calibration_file_button.state and click_state_5:
+                import_calibration_text_state = True
+            else:
+                import_calibration_text_state = False 
+            
+            if import_observation_text_state and click_state_6:
+                import_observation_text_state = True
+            else:
+                import_observation_text_state = False 
 
 
             # Displays a map of the hydrogen line strength and a dot to show where the antenna is pointed at
@@ -1095,6 +1143,22 @@ while running:
                 manual_ra_dec_user_input += event.unicode
 
             print(manual_ra_dec_user_input)
+
+        # Input date and time to find a calibration file
+        elif event.type == pygame.KEYDOWN and import_observation_text_state is True:
+            if event.key == pygame.K_RETURN:
+                print("Calibration file entered.")
+                manual_ra_dec_user_input_parsed = user_update_ra_and_dec_list_parse(manual_ra_dec_user_input)
+                user_update_ra_and_dec(manual_ra_dec_user_input_parsed)
+
+                equatorial_to_galactic()
+
+            elif event.key == pygame.K_BACKSPACE:
+                manual_ra_dec_user_input = manual_ra_dec_user_input[:-1]
+
+            else:
+                manual_ra_dec_user_input += event.unicode
+
 
     screen.fill(main_screen_color)
 
