@@ -289,7 +289,7 @@ def daily_observation_folder_name_creator() -> str:
     month = time_tuple.tm_mon
     normal_day = time_tuple.tm_mday
    
-    return f"HL Data From {year} day {year_day} or {year}-{month}-{normal_day}"
+    return f"HI Data From {year} day {year_day} or {year}-{month}-{normal_day}"
 
 # Function that gets the time right now and returns it in a year, month, day format
 def parse_time() -> str:
