@@ -866,6 +866,7 @@ display_round = 2
 
 width_constant = -245
 display_value_x_location = screen_width / 2 + width_constant
+display_text_size = 17
 
 calibration_duration = 10 # I already defined this varabile at the start of the script so this is here so I can know what is going on
 
@@ -1104,8 +1105,8 @@ while running:
     display_location_2 = f"Elevation: {default_location_parameters['height']}(m)"
 
     draw_txt(screen, f"Geographic Location:", 20, basic_text_color, display_value_x_location, screen_height / 2 - 300)
-    draw_txt(screen, display_location_1, 20, basic_text_color, display_value_x_location, screen_height / 2 - 270)
-    draw_txt(screen, display_location_2, 20, basic_text_color, display_value_x_location, screen_height / 2 - 240)
+    draw_txt(screen, display_location_1, display_text_size, basic_text_color, display_value_x_location, screen_height / 2 - 270)
+    draw_txt(screen, display_location_2, display_text_size, basic_text_color, display_value_x_location, screen_height / 2 - 240)
 
     # default_observation_coordinates['']
     display_coordinates_1 = f"Azimuth: {default_observation_coordinates['azimuth']}(deg), Altitude: {default_observation_coordinates['altitude']}(deg)"
@@ -1114,15 +1115,15 @@ while running:
 
 
     draw_txt(screen, f"Astronomical Coordinates:", 20, basic_text_color, display_value_x_location, screen_height / 2 - 180)
-    draw_txt(screen, display_coordinates_1, 20, basic_text_color, display_value_x_location, screen_height / 2 - 150)
-    draw_txt(screen, display_coordinates_2, 20, basic_text_color, display_value_x_location, screen_height / 2 - 120)
-    draw_txt(screen, display_coordinates_3, 20, basic_text_color, display_value_x_location, screen_height / 2 - 90)
+    draw_txt(screen, display_coordinates_1, display_text_size, basic_text_color, display_value_x_location, screen_height / 2 - 150)
+    draw_txt(screen, display_coordinates_2, display_text_size, basic_text_color, display_value_x_location, screen_height / 2 - 120)
+    draw_txt(screen, display_coordinates_3, display_text_size, basic_text_color, display_value_x_location, screen_height / 2 - 90)
 
 
     draw_txt(screen, f"Additional Parameters:", 20, basic_text_color, display_value_x_location, screen_height/2 - 30)
-    draw_txt(screen, f"Observation Duration: {final_observing_values['duration']}(s)", 20, basic_text_color, display_value_x_location, screen_height / 2)
-    draw_txt(screen, f"Calibration Duration: {calibration_duration}(s)", 20, basic_text_color, display_value_x_location, screen_height / 2 + 30)
-    draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color, display_value_x_location, screen_height / 2 + 60)
+    draw_txt(screen, f"Observation Duration: {final_observing_values['duration']}(s)", display_text_size, basic_text_color, display_value_x_location, screen_height / 2)
+    draw_txt(screen, f"Calibration Duration: {calibration_duration}(s)", display_text_size, basic_text_color, display_value_x_location, screen_height / 2 + 30)
+    draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", display_text_size, basic_text_color, display_value_x_location, screen_height / 2 + 60)
 
     if manual_alt_az_button.state == True:
         draw_txt(screen, f"Like: az,alt {manual_alt_az_user_input}", 19, basic_text_color,
