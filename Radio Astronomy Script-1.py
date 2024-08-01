@@ -888,10 +888,10 @@ while running:
 
             # Sorts cal files because I forget to sort them before closing the program
             try:
-                    general_data_sorter_function(general_data_folder_name, calibration= calibration_raw_data_file_name, 
-                                                 calibration_header= calibration_dat_file_header_name)
+                general_data_sorter_function(general_data_folder_name, calibration= calibration_raw_data_file_name,
+                                            calibration_header = calibration_dat_file_header_name)
             except FileNotFoundError as error_:
-                    print("The calibration file does not exit or has been sorted already.", error_)
+                print("The calibration file does not exit or has been sorted already.", error_)
 
             raise Exception # raises basic error so the program will stop
 
