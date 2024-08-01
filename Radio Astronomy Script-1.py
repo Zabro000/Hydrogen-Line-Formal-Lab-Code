@@ -117,7 +117,7 @@ night_mode_button_colors = {'off': black, 'on': red, 'hover': other_red}
 ### Starting pygame
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Hydrogen Line")
+pygame.display.set_caption("Hydrogen Line Observer")
 clock = pygame.time.Clock()
 font_name = pygame.font.match_font('calibri')
 
