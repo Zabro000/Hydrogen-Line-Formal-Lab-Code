@@ -1,5 +1,5 @@
 # Hydrogen Line Radio Astronomy Program and Example Data
-This is a python program which controls a software defined radio (SDR) to take observations of the hydrogen line. It is built around the Virgo library to take observations, and plot collected data. Taking observations with an SDR must be done on a Linux operating system (OS) – with all the dependencies the Virgo library needs installed. Other functionality does not need a Linux OS. Generating maps of the sky in the hydrogen line, and converting between astronomical coordinate systems can be done on any OS, so long as the Virgo library is installed. 
+This is a python program which controls a software defined radio (SDR) to take observations of the hydrogen line. It is built around the Virgo library. To take observations with a software defined radio, the program must be ran on a Linux operating system (OS) – with all the dependencies the Virgo library needs installed. Other functionality does not need a Linux OS. Generating maps of the sky in the hydrogen line, and converting between astronomical coordinate systems can be done on any OS, so long as the Virgo library is installed. 
 
 The python file, “Radio Astronomy Script-1” is the aforementioned python program; running it will start the program. The example plots, images, and data are found in the folder titled, “Example Observation Data”. 
 
