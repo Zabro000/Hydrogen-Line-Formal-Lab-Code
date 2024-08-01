@@ -885,8 +885,15 @@ while running:
         if event.type == pygame.QUIT:
             running = False
             print("Program has stopped.")
-            # raises basic error so the program will stop
-            raise Exception
+
+            # Sorts cal files because I forget to sort them before closing the program
+            try:
+                    general_data_sorter_function(general_data_folder_name, calibration= calibration_raw_data_file_name, 
+                                                 calibration_header= calibration_dat_file_header_name)
+            except FileNotFoundError as error_:
+                    print("The calibration file does not exit or has been sorted already.", error_)
+
+            raise Exception # raises basic error so the program will stop
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             click_state_1 = Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
