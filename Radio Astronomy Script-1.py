@@ -803,12 +803,12 @@ while running:
     pygame.display.flip()
 
 ### Second loop for getting the observation ready, the functions for the user input is the same so there are only comments on the new bits
-manual_alt_az_button = Button("Manual Alt/Az", screen_width / 2 - 600, screen_height / 2 - 300)
-hi_display_button = Button("Create Hydrogen Map", screen_width / 2 - 600, screen_height / 2 + 100)
+manual_alt_az_button = Button("Change Az/Alt", screen_width / 2 - 600, screen_height / 2 - 300)
+hi_display_button = Button("Create Hydrogen Map", screen_width / 2 - 600, screen_height / 2 + 100, button_text_size = 19)
 run_observation_button = Button("Begin Observation", screen_width / 2 + 600, screen_height / 2 - 100)
-manual_ra_dec_button = Button("Manual Ra/Dec", screen_width / 2 - 600, screen_height / 2 - 100)
-change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 600, screen_height / 2 + 300, button_text_size= 17)
-change_calibration_time_button = Button("Change Calibration Time", screen_width / 2 - 300, screen_height / 2 + 300, button_text_size= 17)
+manual_ra_dec_button = Button("Change Ra/Dec", screen_width / 2 - 600, screen_height / 2 - 100)
+change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 600, screen_height / 2 + 300, button_text_size = 17)
+change_calibration_time_button = Button("Change Calibration Time", screen_width / 2 - 300, screen_height / 2 + 300, button_text_size = 17)
 sort_calibration_files_button = Button("Sort Cal Files", screen_width / 2 + 540, screen_height / 2 + 185, button_width = 85, button_height = 50, button_text_size = 13)
 plot_just_finished_observation_button = Button("Plot Data", screen_width / 2 + 600, screen_height / 2 + 100)
 begin_calibration_button = Button("Begin Calibration",screen_width / 2 + 600, screen_height / 2 - 300)
@@ -864,7 +864,7 @@ display_coordinates_1 = None
 display_coordinates_2 = None
 display_round = 2
 
-width_constant = -245
+width_constant = -255
 display_value_x_location = screen_width / 2 + width_constant
 display_text_size = 17
 
