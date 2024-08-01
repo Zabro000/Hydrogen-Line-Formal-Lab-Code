@@ -789,8 +789,8 @@ while running:
     display_clock = display_time()
     draw_txt(screen, display_clock, 25, basic_text_color, screen_width / 2, 50)
 
-    display_location = f"Latitude: {default_location_parameters['lat']}(deg), Longitude: {default_location_parameters['lon']}(deg), Height: {default_location_parameters['height']}(m)"
-    draw_txt(screen, f"Location:", 20, basic_text_color, screen_width / 2 + 400, screen_height / 2 - 30)
+    display_location = f"Latitude: {default_location_parameters['lat']}(deg), Longitude: {default_location_parameters['lon']}(deg), Elevation: {default_location_parameters['height']}(m)"
+    draw_txt(screen, f"Geographic Location:", 20, basic_text_color, screen_width / 2 + 400, screen_height / 2 - 30)
     draw_txt(screen, display_location, 20, basic_text_color, screen_width / 2 + 400, screen_height / 2)
 
     # Draw the user input for the location settings input only if the button for that is still on
@@ -864,7 +864,7 @@ display_coordinates_1 = None
 display_coordinates_2 = None
 display_round = 2
 
-width_constant = -260
+width_constant = -245
 display_value_x_location = screen_width / 2 + width_constant
 
 calibration_duration = 10 # I already defined this varabile at the start of the script so this is here so I can know what is going on
@@ -1101,26 +1101,28 @@ while running:
     draw_txt(screen, display_clock, 25, basic_text_color, screen_width / 2, 50)
 
     display_location_1 = f"Latitude: {default_location_parameters['lat']}(deg), Longitude: {default_location_parameters['lon']}(deg)"
-    display_location_2 = f"Height: {default_location_parameters['height']}(m)"
+    display_location_2 = f"Elevation: {default_location_parameters['height']}(m)"
 
-    draw_txt(screen, f"Location:", 20, basic_text_color, display_value_x_location, screen_height / 2 - 300)
+    draw_txt(screen, f"Geographic Location:", 20, basic_text_color, display_value_x_location, screen_height / 2 - 300)
     draw_txt(screen, display_location_1, 20, basic_text_color, display_value_x_location, screen_height / 2 - 270)
     draw_txt(screen, display_location_2, 20, basic_text_color, display_value_x_location, screen_height / 2 - 240)
 
     # default_observation_coordinates['']
     display_coordinates_1 = f"Azimuth: {default_observation_coordinates['azimuth']}(deg), Altitude: {default_observation_coordinates['altitude']}(deg)"
     display_coordinates_2 = f"Right Ascension: {round(default_observation_coordinates['right ascension'], display_round)}(hr), Declination: {round(default_observation_coordinates['declination'], display_round)}(deg)"
+    display_coordinates_3 = f"Galactic Longitude: {round(default_observation_coordinates['galactic longitude'], display_round)}(deg), Galactic Latitude: {round(default_observation_coordinates['galactic latitude'], display_round)}(deg)"
 
-    draw_txt(screen, f"Coordinates:", 20, basic_text_color, display_value_x_location, screen_height / 2 - 180)
+
+    draw_txt(screen, f"Astronomical Coordinates:", 20, basic_text_color, display_value_x_location, screen_height / 2 - 180)
     draw_txt(screen, display_coordinates_1, 20, basic_text_color, display_value_x_location, screen_height / 2 - 150)
     draw_txt(screen, display_coordinates_2, 20, basic_text_color, display_value_x_location, screen_height / 2 - 120)
+    draw_txt(screen, display_coordinates_3, 20, basic_text_color, display_value_x_location, screen_height / 2 - 90)
 
-    draw_txt(screen, f"Observation Time: {final_observing_values['duration']}(s)", 20,
-             basic_text_color, display_value_x_location, screen_height / 2 - 60)
-    draw_txt(screen, f"Calibration Time: {calibration_duration}(s)", 20,
-             basic_text_color, display_value_x_location, screen_height / 2 - 30)
-    draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color,
-             display_value_x_location, screen_height / 2)
+
+    draw_txt(screen, f"Additional Parameters:", 20, basic_text_color, display_value_x_location, screen_height/2 - 30)
+    draw_txt(screen, f"Observation Duration: {final_observing_values['duration']}(s)", 20, basic_text_color, display_value_x_location, screen_height / 2)
+    draw_txt(screen, f"Calibration Duration: {calibration_duration}(s)", 20, basic_text_color, display_value_x_location, screen_height / 2 + 30)
+    draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color, display_value_x_location, screen_height / 2 + 60)
 
     if manual_alt_az_button.state == True:
         draw_txt(screen, f"Like: az,alt {manual_alt_az_user_input}", 19, basic_text_color,
