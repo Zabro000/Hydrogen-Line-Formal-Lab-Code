@@ -117,7 +117,7 @@ night_mode_button_colors = {'off': black, 'on': red, 'hover': other_red}
 ### Starting pygame
 pygame.init()
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Hydrogen Line")
+pygame.display.set_caption("Hydrogen Line Observer")
 clock = pygame.time.Clock()
 font_name = pygame.font.match_font('calibri')
 
@@ -289,7 +289,7 @@ def daily_observation_folder_name_creator() -> str:
     month = time_tuple.tm_mon
     normal_day = time_tuple.tm_mday
    
-    return f"HL Data From {year} day {year_day} or {year}-{month}-{normal_day}"
+    return f"HI Data From {year} day {year_day} or {year}-{month}-{normal_day}"
 
 # Function that gets the time right now and returns it in a year, month, day format
 def parse_time() -> str:
@@ -789,8 +789,8 @@ while running:
     display_clock = display_time()
     draw_txt(screen, display_clock, 25, basic_text_color, screen_width / 2, 50)
 
-    display_location = f"Latitude: {default_location_parameters['lat']}(deg), Longitude: {default_location_parameters['lon']}(deg), Height: {default_location_parameters['height']}(m)"
-    draw_txt(screen, f"Location:", 20, basic_text_color, screen_width / 2 + 400, screen_height / 2 - 30)
+    display_location = f"Latitude: {default_location_parameters['lat']}(deg), Longitude: {default_location_parameters['lon']}(deg), Elevation: {default_location_parameters['height']}(m)"
+    draw_txt(screen, f"Geographic Location:", 20, basic_text_color, screen_width / 2 + 400, screen_height / 2 - 30)
     draw_txt(screen, display_location, 20, basic_text_color, screen_width / 2 + 400, screen_height / 2)
 
     # Draw the user input for the location settings input only if the button for that is still on
@@ -803,23 +803,19 @@ while running:
     pygame.display.flip()
 
 ### Second loop for getting the observation ready, the functions for the user input is the same so there are only comments on the new bits
-manual_alt_az_button = Button("Manual Alt/Az", screen_width / 2 - 600, screen_height / 2 - 300)
-auto_alt_az_button = Button("Auto Alt Az", screen_width / 2 - 600, screen_height / 2 + 100)
-hi_display_button = Button("Create Hydrogen Map", screen_width / 2 - 600, screen_height / 2 + 300)
-test_spatial_phidget_button = Button("Test Phidget", screen_width / 2 - 600, screen_height / 2 - 100)
+manual_alt_az_button = Button("Change Az/Alt", screen_width / 2 - 600, screen_height / 2 - 300)
+hi_display_button = Button("Create Hydrogen Map", screen_width / 2 - 600, screen_height / 2 + 100, button_text_size = 19)
 run_observation_button = Button("Begin Observation", screen_width / 2 + 600, screen_height / 2 - 100)
-manual_ra_dec_button = Button("Manual Ra/Dec", screen_width / 2 - 300, screen_height / 2 + 100)
-change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 300, screen_height / 2 + 300, button_text_size= 17)
-change_calibration_time_button = Button("Change Calibration Time", screen_width / 2 - 0, screen_height / 2 + 300, button_text_size= 17)
+manual_ra_dec_button = Button("Change Ra/Dec", screen_width / 2 - 600, screen_height / 2 - 100)
+change_observation_time_button = Button("Change Observation Time", screen_width / 2 - 600, screen_height / 2 + 300, button_text_size = 17)
+change_calibration_time_button = Button("Change Calibration Time", screen_width / 2 - 300, screen_height / 2 + 300, button_text_size = 17)
 sort_calibration_files_button = Button("Sort Cal Files", screen_width / 2 + 540, screen_height / 2 + 185, button_width = 85, button_height = 50, button_text_size = 13)
 plot_just_finished_observation_button = Button("Plot Data", screen_width / 2 + 600, screen_height / 2 + 100)
 begin_calibration_button = Button("Begin Calibration",screen_width / 2 + 600, screen_height / 2 - 300)
 
 screen_2_buttons = pygame.sprite.Group()
 screen_2_buttons.add(manual_alt_az_button)
-screen_2_buttons.add(auto_alt_az_button)
 screen_2_buttons.add(hi_display_button)
-screen_2_buttons.add(test_spatial_phidget_button)
 screen_2_buttons.add(run_observation_button)
 screen_2_buttons.add(change_observation_time_button)
 screen_2_buttons.add(plot_just_finished_observation_button)
@@ -868,8 +864,9 @@ display_coordinates_1 = None
 display_coordinates_2 = None
 display_round = 2
 
-width_constant = -260
+width_constant = -255
 display_value_x_location = screen_width / 2 + width_constant
+display_text_size = 17
 
 calibration_duration = 10 # I already defined this varabile at the start of the script so this is here so I can know what is going on
 
@@ -897,9 +894,9 @@ while running:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             click_state_1 = Button.on_or_off_button_click(manual_alt_az_button, pygame.mouse.get_pos())
-            temp_state_5 = Button.doer_button_click(auto_alt_az_button, pygame.mouse.get_pos())
+            # temp_state_5 = Button.doer_button_click(auto_alt_az_button, pygame.mouse.get_pos())
             temp_state_1 = Button.doer_button_click(hi_display_button, pygame.mouse.get_pos())
-            temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
+           #  temp_state_2 = Button.doer_button_click(test_spatial_phidget_button, pygame.mouse.get_pos())
             temp_state_3 = Button.doer_button_click(run_observation_button, pygame.mouse.get_pos())
             temp_state_4 = Button.doer_button_click(plot_just_finished_observation_button, pygame.mouse.get_pos())
             temp_state_6 = Button.doer_button_click(begin_calibration_button, pygame.mouse.get_pos())
@@ -940,18 +937,6 @@ while running:
                     general_data_sorter_function(general_data_folder_name, hydrogen_map = temp_file_name_dict['HI map'])
                 except Exception as error_:
                     print("Creating a map of the hydrogen line signal strength was unsuccessful. ", error_)
-
-
-            # Tries to initalize the angle phidget sensor
-            if temp_state_2 == True:
-                angle_sensor = Spatial()
-                try:
-                    angle_sensor.openWaitForAttachment(attachment_time)
-                except PhidgetException as error:
-                    print("The phidget is probably not attached, ", error)
-                else:
-                    print("The angle sensor is connected!")
-
 
             # Lets the user sort and store the calibration files when they are done with them
             if temp_state_7 is True:
@@ -1041,10 +1026,6 @@ while running:
                 except Exception as error:
                     print("Probably no observation and/or calibration has been done yet. ", error)
 
-           
-            if temp_state_5 == True:
-                print("There is no code here yet.")
-
 
         # Text input for the alt and az and conversion to ra and dec
         if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
@@ -1121,26 +1102,28 @@ while running:
     draw_txt(screen, display_clock, 25, basic_text_color, screen_width / 2, 50)
 
     display_location_1 = f"Latitude: {default_location_parameters['lat']}(deg), Longitude: {default_location_parameters['lon']}(deg)"
-    display_location_2 = f"Height: {default_location_parameters['height']}(m)"
+    display_location_2 = f"Elevation: {default_location_parameters['height']}(m)"
 
-    draw_txt(screen, f"Location:", 20, basic_text_color, display_value_x_location, screen_height / 2 - 300)
-    draw_txt(screen, display_location_1, 20, basic_text_color, display_value_x_location, screen_height / 2 - 270)
-    draw_txt(screen, display_location_2, 20, basic_text_color, display_value_x_location, screen_height / 2 - 240)
+    draw_txt(screen, f"Geographic Location:", 20, basic_text_color, display_value_x_location, screen_height / 2 - 300)
+    draw_txt(screen, display_location_1, display_text_size, basic_text_color, display_value_x_location, screen_height / 2 - 270)
+    draw_txt(screen, display_location_2, display_text_size, basic_text_color, display_value_x_location, screen_height / 2 - 240)
 
     # default_observation_coordinates['']
     display_coordinates_1 = f"Azimuth: {default_observation_coordinates['azimuth']}(deg), Altitude: {default_observation_coordinates['altitude']}(deg)"
     display_coordinates_2 = f"Right Ascension: {round(default_observation_coordinates['right ascension'], display_round)}(hr), Declination: {round(default_observation_coordinates['declination'], display_round)}(deg)"
+    display_coordinates_3 = f"Galactic Longitude: {round(default_observation_coordinates['galactic longitude'], display_round)}(deg), Galactic Latitude: {round(default_observation_coordinates['galactic latitude'], display_round)}(deg)"
 
-    draw_txt(screen, f"Coordinates:", 20, basic_text_color, display_value_x_location, screen_height / 2 - 180)
-    draw_txt(screen, display_coordinates_1, 20, basic_text_color, display_value_x_location, screen_height / 2 - 150)
-    draw_txt(screen, display_coordinates_2, 20, basic_text_color, display_value_x_location, screen_height / 2 - 120)
 
-    draw_txt(screen, f"Observation Time: {final_observing_values['duration']}(s)", 20,
-             basic_text_color, display_value_x_location, screen_height / 2 - 60)
-    draw_txt(screen, f"Calibration Time: {calibration_duration}(s)", 20,
-             basic_text_color, display_value_x_location, screen_height / 2 - 30)
-    draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", 20, basic_text_color,
-             display_value_x_location, screen_height / 2)
+    draw_txt(screen, f"Astronomical Coordinates:", 20, basic_text_color, display_value_x_location, screen_height / 2 - 180)
+    draw_txt(screen, display_coordinates_1, display_text_size, basic_text_color, display_value_x_location, screen_height / 2 - 150)
+    draw_txt(screen, display_coordinates_2, display_text_size, basic_text_color, display_value_x_location, screen_height / 2 - 120)
+    draw_txt(screen, display_coordinates_3, display_text_size, basic_text_color, display_value_x_location, screen_height / 2 - 90)
+
+
+    draw_txt(screen, f"Additional Parameters:", 20, basic_text_color, display_value_x_location, screen_height/2 - 30)
+    draw_txt(screen, f"Observation Duration: {final_observing_values['duration']}(s)", display_text_size, basic_text_color, display_value_x_location, screen_height / 2)
+    draw_txt(screen, f"Calibration Duration: {calibration_duration}(s)", display_text_size, basic_text_color, display_value_x_location, screen_height / 2 + 30)
+    draw_txt(screen, f"SDR Gain: {final_observing_values['rf_gain']}(dB)", display_text_size, basic_text_color, display_value_x_location, screen_height / 2 + 60)
 
     if manual_alt_az_button.state == True:
         draw_txt(screen, f"Like: az,alt {manual_alt_az_user_input}", 19, basic_text_color,
