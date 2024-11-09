@@ -10,7 +10,7 @@ import shutil
 
 # venv\Scripts\Activate.ps1
 
-### Virgo and radio astronomy varibles ###
+# Virgo and radio astronomy varibles
 observation_time_offset = 4
 
 observing_time = 10 # in seconds
