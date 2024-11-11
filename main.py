@@ -1,12 +1,13 @@
 import virgo
 import time
 import pygame
-import astropy
 import operator
 from Phidget22.Phidget import *
 from Phidget22.Devices.Spatial import *
 import os
 import shutil 
+from astronomy_functions.input_parsing_functions import from_az_alt_update_ra_dec as cloud
+from astronomy_functions.input_parsing_functions import equatorial_to_galactic as sugar
 
 # venv\Scripts\Activate.ps1
 
@@ -49,24 +50,18 @@ final_observing_values = {
 ### Varibles and dicts for the astronomical coordinates
 observation_ra = 0
 observation_dec = 0
-observation_ra_dec = [observation_ra, observation_dec]
 observation_alt = 0
 observation_az = 0
-observation_az_alt = [observation_az, observation_alt]
 observation_gal_long = 0
 observation_gal_lat = 0
-observation_gal_long_lat = [observation_gal_long]
 
 default_observation_coordinates = {
     'azimuth': observation_az,
     'altitude': observation_alt,
-    'azimuth and altitude list': observation_az_alt,
     'right ascension': observation_ra,
     'declination': observation_dec,
-    'right ascension and declination list': observation_ra_dec,
     'galactic longitude': observation_gal_long,
     'galactic latitude': observation_gal_lat,
-    'galactic longitude and latitude list': observation_gal_long_lat
 }
 
 ### Initalizing location varibles
@@ -394,13 +389,10 @@ def error_value_coordinates_assign() -> None:
 
     default_observation_coordinates['right ascension'] = error_value
     default_observation_coordinates['declination'] = error_value
-    default_observation_coordinates['right ascension and declination list'] = error_list
     default_observation_coordinates['altitude'] = error_value
     default_observation_coordinates['azimuth'] = error_value
-    default_observation_coordinates['azimuth and altitude list'] = error_list
     default_observation_coordinates['galactic longitude'] = error_value
     default_observation_coordinates['galactic latitude'] = error_value
-    default_observation_coordinates['galactic longitude and latitude list'] = error_list
 
 
 # Function that parses the user input of what alt and az the antenna is pointed at
@@ -447,6 +439,7 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
 
     # Function that gets the ra and dec
     try:
+        print(f"lat: {default_location_parameters['lat']} lon: {default_location_parameters['lon']}")
         ra_dec_list = virgo.equatorial(default_observation_coordinates['altitude'],
                                        default_observation_coordinates['azimuth'],
                                        default_location_parameters['lat'], default_location_parameters['lon'],
@@ -458,14 +451,8 @@ def user_change_az_alt_parse(az_alt_input_list) -> None:
         print("Conversion to right ascension and declination failed. ", error)
         return None
 
-    az_alt_list = [default_observation_coordinates['azimuth'], default_observation_coordinates['altitude']]
-    default_observation_coordinates['azimuth and altitude list'] = az_alt_list
-
     default_observation_coordinates['right ascension'] = ra_dec_list[0]
     default_observation_coordinates['declination'] = ra_dec_list[1]
-
-    ra_dec_list = [default_observation_coordinates['right ascension'], default_observation_coordinates['declination']]
-    default_observation_coordinates['right ascension and declination list'] = ra_dec_list
 
     print("Done updating observtion coordinates! ", default_observation_coordinates)
 
@@ -551,11 +538,9 @@ def user_update_ra_and_dec(inputted_list) -> None:
 
     default_observation_coordinates['right ascension'] = right_ascension
     default_observation_coordinates['declination'] = declination
-    default_observation_coordinates['right ascension and declination list'] = coord_list
-
+    
     default_observation_coordinates['altitude'] = error_value
     default_observation_coordinates['azimuth'] = error_value
-    default_observation_coordinates['azimuth and altitude list'] = error_list
 
     print("Done updating the right ascension and declination. Note the altitude and azimuth does not line up now.")
 
@@ -577,7 +562,7 @@ def equatorial_to_galactic() -> None:
 
     default_observation_coordinates['galactic longitude'] = galactic_long_lat_list[0]
     default_observation_coordinates['galactic latitude'] = galactic_long_lat_list[1]
-    default_observation_coordinates['galactic longitude and latitude list'] = [galactic_long_lat_list[0], galactic_long_lat_list[1]]
+
 
     print("Done converting to galactic longitude and latitude. ",
           default_observation_coordinates['galactic longitude and latitude list'])
@@ -968,7 +953,7 @@ while running:
                 final_observing_values['duration'] += observation_time_offset
                 
                 try: 
-                    virgo.observe(final_observing_values, spectrometer= 'wola', obs_file= calibration_raw_data_file_name,
+                    virgo.observe(final_observing_values, spectrometer = 'wola', obs_file = calibration_raw_data_file_name,
                                   start_in=observation_start_time)
                     print("Calibration complete!")
                 except ModuleNotFoundError as error_:
@@ -1028,14 +1013,18 @@ while running:
 
 
         # Text input for the alt and az and conversion to ra and dec
+        ########################## Experiment
         if event.type == pygame.KEYDOWN and manual_alt_az_text_state == True:
 
             if event.key == pygame.K_RETURN:
                 print("Alt, az, ra and dec set.")
 
+                #cloud(manual_alt_az_user_input, default_location_parameters['height'], default_location_parameters['lat'], default_location_parameters['lon'])
                 manual_alt_az_user_input_parsed = user_change_az_alt_list_parse(manual_alt_az_user_input)
                 user_change_az_alt_parse(manual_alt_az_user_input_parsed)
-                equatorial_to_galactic()
+                #sugar()
+
+
 
             elif event.key == pygame.K_BACKSPACE:
                 manual_alt_az_user_input = manual_alt_az_user_input[:-1]
